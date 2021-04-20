@@ -1,0 +1,94 @@
+
+<!-- Page Title
+============================================= -->
+<section id="page-title">
+
+			<div class="container clearfix">
+				<h1>Event Registration</h1>
+				<span>Forms Widget</span>
+				<ol class="breadcrumb">
+					<li class="breadcrumb-item"><a href="#">Home</a></li>
+					<li class="breadcrumb-item"><a href="#">Widgets</a></li>
+					<li class="breadcrumb-item active" aria-current="page">Event Registration Form</li>
+				</ol>
+			</div>
+
+		</section><!-- #page-title end -->
+<!-- Content
+============================================= -->
+<section id="content">
+  <div class="content-wrap">
+    <div class="container clearfix">
+      <div class="form-widget">
+        <div class="form-result"></div>
+        <div class="row">
+          <div class="col-lg-12">
+<!--            <form method="post" class="row" id="profile-form" name="profile-form" enctype="multipart/form-data" action="">-->
+<!--              {%csrf_token%}-->
+<!--              {%for form in profile_form%}-->
+<!--              {{ form.label_tag }}-->
+<!--              {{form}}-->
+<!--              {%endfor%}-->
+<!--				<div class="col-12">-->
+<!--				  <button type="submit" class="btn btn-secondary" >Добавить</button>-->
+<!--			  </div>-->
+<!--            </form>-->
+            <form class="row" action="" method="post" >
+				{%csrf_token%}
+              <div class="form-process">
+                <div class="css3-spinner">
+                  <div class="css3-spinner-scaler"></div>
+                </div>
+              </div>
+              <div class="col-6 form-group">
+                <label for="id_first_name">Имя:</label>
+                <input type="text" name="first_name" id="id_first_name" class="form-control required" value="" placeholder="Введите имя">
+              </div>
+              <div class="col-6 form-group">
+				  <label>Фамилия:</label>
+				  <input type="text" name="last_name" id="id_last_name" class="form-control required" value="" placeholder="Введите фамилию">
+			  </div>
+				<div class="col-12 bottommargin-sm">
+					<label for="id_b_day">Date Time Picker:</label>
+					<div class="form-group mb-0">
+						<div class="input-group text-left">
+							<div class="input-group-prepend" data-target=".datetimepicker1" data-toggle="datetimepicker">
+								<div class="input-group-text"><i class="icon-calendar3"></i></div>
+							</div>
+							<input id="id_b_day" name="b_day" type="text" class="form-control datetimepicker-input datetimepicker1" data-target=".datetimepicker1" data-toggle="datetimepicker" placeholder="Выберитe дату рождения" />
+						</div>
+					</div>
+				</div>
+				<div class="col-6 form-group">
+					<label for="id_photo">Добавить фото:</label><br>
+					<input id="id_photo" type="file" name="photo" multiple class="file file-loading" data-show-preview="false">
+				</div>
+              <div class="col-6 form-group">
+				  <label for="id_sex">Gender:</label><br>
+                  <select class="form-control required" name="sex" id="id_sex">
+                      <option value="">-- Select One --</option>
+                      <option value="men">Мужчина</option>
+                      <option value="women">Женщина</option>
+                  </select>
+			  </div>
+
+              <div class="col-12">
+				  <div class="form-group">
+					  <label>Bio:</label>
+					  <textarea name="bio" id="id_bio" class="form-control required" cols="30" rows="5"></textarea>
+				  </div>
+			  </div>
+              <div class="col-12 d-none">
+                  <input type="text" id="event-registration-botcheck" name="event-registration-botcheck" value="" />
+              </div>
+              <div class="col-12">
+				  <button type="submit" name="event-registration-submit" class="btn btn-secondary">Добавить</button>
+			  </div>
+              <input type="hidden" name="prefix" value="event-registration-">
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section><!-- #content end -->

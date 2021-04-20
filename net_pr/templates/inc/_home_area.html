@@ -1,0 +1,52 @@
+{%load static%}
+<style>
+	.content-wrap {
+    position: relative;
+    padding: 1px 0;
+    overflow: hidden;
+}
+</style>
+<section id="content">
+	<div class="content-wrap">
+		<div class="container clearfix">
+			<div class="row clearfix">
+				<div class="col-md-12">
+					<div class="content-wrap bg-light">
+                        <div class="row gutter-40 posts-md mt-4">
+                            <div class="entry col-10">
+                                <div class="grid-inner row align-items-center no-gutters">
+                                    {% for post in post %}
+                                    <div class="col-md-12 pl-md-4">
+																	<div class="testi-image">
+																		<a href="#"><img src="{{post.user_name.photo.url}}" alt="Customer Testimonails" draggable="false"></a>
+																	<div></div></div>
+																	<div class="entry-meta">
+																		<a href="#">{{user.first_name}}</a>
+																		<ul>
+																			<li><i class="icon-calendar3"></i> {{post.date}}</li>
+																			<li><a href="blog-single.html#comments"><i class="icon-comments"></i> 13</a></li>
+																		</ul>
+																	</div>
+																</div>
+                                    <div class="col-md-12 pl-md-6">
+                                        <div class="entry-content">
+                                            <p>{{post.post}}</p>
+                                            {%if post.image %}
+                                            <img src="{{post.image.url}}" alt="Standard Post" width="200" height="200">
+                                            {%endif%}
+                                            <br><br>
+                                        </div>
+                                    </div>
+                                    <br>
+                                    {%endfor%}
+                                </div>
+                            </div>
+                        </div>
+					</div>
+				</div>
+				<div class="w-100 line d-block d-md-none"></div>
+			</div>
+		</div>
+	</div>
+</section>
+<br>

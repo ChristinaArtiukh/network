@@ -1,0 +1,102 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html dir="ltr" lang="en-US">
+<head>
+
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta name="author" content="SemiColonWeb" />
+
+	<!-- Stylesheets
+	============================================= -->
+	<link href="https://fonts.googleapis.com/css?family=Lato:300,400,400i,700|Poppins:300,400,500,600,700|PT+Serif:400,400i&display=swap" rel="stylesheet" type="text/css" />
+	<link rel="stylesheet" href="{% static 'css/bootstrap.css' %}" type="text/css" />
+	<link rel="stylesheet" href="{% static 'style.css' %}" type="text/css" />
+	<link rel="stylesheet" href="{% static 'css/dark.css' %}" type="text/css" />
+	<link rel="stylesheet" href="{% static 'css/font-icons.css' %}" type="text/css" />
+	<link rel="stylesheet" href="{% static 'css/animate.css' %}" type="text/css" />
+	<link rel="stylesheet" href="{% static 'css/magnific-popup.css' %}" type="text/css" />
+	<link rel="stylesheet" href="{% static 'css/calendar.css' %}" type="text/css" />
+
+	<link rel="stylesheet" href="{% static 'css/custom.css' %}" type="text/css" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+	<!-- Document Title
+	============================================= -->
+	<title>Home - Events Layout | Canvas</title>
+
+</head>
+
+<body class="stretched">
+
+	<!-- Document Wrapper
+	============================================= -->
+	<div id="wrapper" class="clearfix">
+		{%include 'inc/_vertical_nav.html'%}
+		<!-- Header
+		============================================= -->
+		{%include 'inc/_header.html'%}
+		<!-- #header end -->
+
+		<!-- Content
+		============================================= -->
+        {%block content%} {%endblock%}
+		<!-- #content end -->
+
+		<!-- Footer
+		============================================= -->
+		{%include 'inc/_footer.html'%}
+		<!-- #footer end -->
+
+	</div><!-- #wrapper end -->
+
+	<!-- Go To Top
+	============================================= -->
+	<div id="gotoTop" class="icon-angle-up"></div>
+
+	<!-- JavaScripts
+	============================================= -->
+	<script src="{% static 'js/jquery.js' %}"></script>
+	<script src="{% static 'js/plugins.min.js' %}"></script>
+	<script src="{% static 'js/jquery.calendario.js' %}"></script>
+	<script src="{% static 'js/events-data.js' %}"></script>
+
+	<!-- For Countdown -->
+	<script src="{% static 'js/components/moment.js'%}"></script>
+
+	<!-- Footer Scripts
+	============================================= -->
+	<script src="{% static 'js/functions.js'%}"></script>
+
+	<script>
+		var cal = $( '#calendar' ).calendario( {
+			onDayClick : function( $el, $contentEl, dateProperties ) {
+
+				for( var key in dateProperties ) {
+					console.log( key + ' = ' + dateProperties[ key ] );
+				}
+
+			},
+			caldata : canvasEvents
+		} ),
+		$month = $( '#calendar-month' ).html( cal.getMonthName() ),
+		$year = $( '#calendar-year' ).html( cal.getYear() );
+
+		$( '#calendar-next' ).on( 'click', function() {
+			cal.gotoNextMonth( updateMonthYear );
+		} );
+		$( '#calendar-prev' ).on( 'click', function() {
+			cal.gotoPreviousMonth( updateMonthYear );
+		} );
+		$( '#calendar-current' ).on( 'click', function() {
+			cal.gotoNow( updateMonthYear );
+		} );
+
+		function updateMonthYear() {
+			$month.html( cal.getMonthName() );
+			$year.html( cal.getYear() );
+		}
+	</script>
+
+</body>
+</html>

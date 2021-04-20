@@ -1,0 +1,148 @@
+{%load static%}
+<style>
+	.content-wrap {
+    position: relative;
+    padding: 1px 0;
+    overflow: hidden;
+}
+</style>
+<section id="content">
+	<div class="content-wrap">
+		<div class="container clearfix">
+			<div class="row clearfix">
+				<div class="col-md-12">
+					{%for profile in profile %}
+					<div class="team team-list row align-items-center">
+						{% if profile.photo %}
+						<div class="team-image col-sm-3">
+							<img src="{{profile.photo.url}}" alt="{{profile.username}}">
+						</div>
+						{%else%}
+						<div class="team-image col-sm-3">
+							<img src="{% static 'images/icons/avatar.jpg' %}" alt="{{profile.username}}">
+						</div>
+						{% endif %}
+						<div class="team-desc col-sm-6">
+							<div class="team-title"><h4>{{profile.first_name}} {{profile.last_name}}</h4>
+								<span></span></div>
+							<div class="team-content">
+								<p>Дата рождения: {{profile.b_day}}</p>
+							</div>
+						</div>
+					</div>
+					<div class="heading-block border-0">
+						<br>
+						<p>{{profile.bio}}</p>
+					</div>
+					{%endfor%}
+					<div class="content-wrap bg-light">
+						<div class="container">
+							<div class="row justify-content-center">
+								<div class="clear"></div>
+								<div class="row clearfix">
+									<div class="tab-container">
+												<div class="tab-content clearfix" id="tab-posts">
+													<div class="card-body" style="padding: 10px;">
+														<form action=" " method="post" enctype="multipart/form-data">
+															{%csrf_token%}
+															<div class="row">
+																<div class="col-12">
+																	<div class="form-group">
+																		<label for="id_post">Добавить пост</label>
+																		<textarea name="post" id="id_post" class="form-control required" cols="30" rows="5"></textarea>
+																	</div>
+																</div>
+																<div class="col-6 form-group">
+																	<label for="id_image">Добавить фото:</label><br>
+																	<input id="id_image" type="file" name="image" multiple class="file file-loading" data-show-preview="false">
+																</div>
+																<div class="col-12 form-group">
+																	<button class="button button-3d button-black m-0">Добавить</button>
+																</div>
+															</div>
+														</form>
+													</div>
+													<!-- Posts
+													============================================= -->
+														<!-- Comments List
+														============================================= -->
+														<ol class="commentlist clearfix">
+															{% for post in post %}
+															<li class="comment even thread-even depth-1">
+																<div  class="comment-wrap clearfix">
+																	<div class="comment-meta">
+																		<div class="comment-author vcard">
+																			<span class="comment-avatar clearfix">
+																			<img alt="Image" src="{{post.user_name.photo.url}}" class="avatar avatar-60 photo avatar-default" width="60" height="60"></span>
+																		</div>
+																	</div>
+																	<div class="comment-content clearfix">
+																		<div class="comment-author">{{user.first_name}}
+																			<span>
+																				<a href="#" title="Permalink to this comment">{{post.date}}</a></span></div>
+																		<p>{{post.post}}</p>
+																		{%if post.image %}
+																			<img src="{{post.image.url}}" alt="Standard Post" width="200" height="200">
+																		{%endif%}
+																		<br><br>
+<!--																		<a class="comment-reply-link" href="#"><i class="icon-reply"></i></a>-->
+																	</div>
+																	<div class="clear"></div>
+																</div>
+<!--children start--> <!--children tnd-->
+															</li>
+																{%endfor%}
+															<div class="clear"></div>
+														</ol>
+														<!-- .commentlist end -->
+
+													</div>
+												</div>
+											</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="w-100 line d-block d-md-none"></div>
+			</div>
+		</div>
+
+</section>
+<br>
+<!-- #content end -->
+
+<!--<ul class="children">-->
+
+<!--																	<li class="comment byuser comment-author-_smcl_admin odd alt depth-2" id="li-comment-3">-->
+
+<!--																		<div id="comment-3" class="comment-wrap clearfix">-->
+
+<!--																			<div class="comment-meta">-->
+
+<!--																				<div class="comment-author vcard">-->
+
+<!--																					<span class="comment-avatar clearfix">-->
+<!--																					<img alt="Image" src="https://1.gravatar.com/avatar/30110f1f3a4238c619bcceb10f4c4484?s=40&amp;d=http%3A%2F%2F1.gravatar.com%2Favatar%2Fad516503a11cd5ca435acc9bb6523536%3Fs%3D40&amp;r=G" class="avatar avatar-40 photo" width="40" height="40"></span>-->
+
+<!--																				</div>-->
+
+<!--																			</div>-->
+
+<!--																			<div class="comment-content clearfix">-->
+
+<!--																				<div class="comment-author"><a href="#" rel="external nofollow" class="url">SemiColon</a><span><a href="#" title="Permalink to this comment">April 25, 2012 at 1:03 am</a></span></div>-->
+
+<!--																				<p>Nullam id dolor id nibh ultricies vehicula ut id elit.</p>-->
+
+<!--																				<a class="comment-reply-link" href="#"><i class="icon-reply"></i></a>-->
+
+<!--																			</div>-->
+
+<!--																			<div class="clear"></div>-->
+
+<!--																		</div>-->
+
+<!--																	</li>-->
+
+<!--																</ul>-->

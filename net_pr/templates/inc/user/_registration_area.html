@@ -1,0 +1,82 @@
+<!--<section id="page-title" xmlns="http://www.w3.org/1999/html">-->
+<!--	<div class="container clearfix">-->
+<!--		<h1>My Account</h1>-->
+<!--		<ol class="breadcrumb">-->
+<!--			<li class="breadcrumb-item"><a href="#">Home</a></li>-->
+<!--			<li class="breadcrumb-item"><a href="#">Pages</a></li>-->
+<!--			<li class="breadcrumb-item active" aria-current="page">Login</li>-->
+<!--		</ol>-->
+<!--	</div>-->
+<!--</section>-->
+<!-- #page-title end -->
+
+<!-- Content
+============================================= -->
+<section id="content">
+	<div class="content-wrap">
+		<div class="container clearfix">
+			<div class="tabs mx-auto mb-0 clearfix" id="tab-login-register" style="max-width: 500px;">
+				<ul class="tab-nav tab-nav2 center clearfix">
+					<li class="inline-block"><a href="#tab-login">Войти</a></li>
+					<li class="inline-block"><a href="#tab-register">Зарегистрироваться</a></li>
+				</ul>
+				<div class="tab-container">
+					<div class="tab-content" id="tab-login">
+						<div class="card mb-0">
+							<div class="card-body" style="padding: 40px;">
+								<form id="login-form" name="login-form" class="mb-0" action="" method="post">
+									{%csrf_token%}
+									<h3>Войти в аккаунт</h3>
+									<div class="row">
+										<div class="col-12 form-group">
+											<label for="id_username">Логин:</label>
+											<input type="text" id="id_username" name="username" value="" class="form-control" />
+										</div>
+										<div class="col-12 form-group">
+											<label for="id_password">Пароль:</label>
+											<input type="password" id="id_password" name="password" value="" class="form-control" />
+										</div>
+										<div class="col-12 form-group">
+											<button class="button button-3d button-black m-0" id="login-form-submit" type="submit" name="submit" value="login">Войти</button>
+<!--											<a href="#" class="float-right">Forgot Password?</a>-->
+										</div>
+									</div>
+								</form>
+							</div>
+						</div>
+					</div>
+					<div class="tab-content" id="tab-register">
+						<div class="card mb-0">
+							<div class="card-body" style="padding: 40px;">
+								<h3>Регистрация</h3>
+								<form id="register-form" name="register-form" class="row mb-0" action="" method="post">
+									{%csrf_token%}
+									<div class="col-12 form-group">
+										<label for="id_username">Логин:</label>
+										<input type="text" id="id_username" name="username" value="" class="form-control" />
+									</div>
+									<div class="col-12 form-group">
+										<label for="id_email">Email:</label>
+										<input type="text" id="id_email" name="email" value="" class="form-control" />
+									</div>
+									<div class="col-12 form-group">
+										<label for="id_password1">Пароль:</label>
+										<input type="password" id="id_password1" name="password1" value="" class="form-control" />
+									</div>
+									<div class="col-12 form-group">
+										<label for="id_password2">Подтверждение пароля:</label>
+										<input type="password" id="id_password2" name="password2" value="" class="form-control" />
+									</div>
+									<div class="col-12 form-group">
+										<button class="button button-3d button-black m-0" id="register-form-submit" name="submit" type="submit" value="register">Регистрация</button>
+									</div>
+								</form>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+<!-- #content end -->
