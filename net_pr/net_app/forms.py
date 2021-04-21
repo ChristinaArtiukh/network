@@ -1,6 +1,6 @@
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django import forms
-from .models import User, Post
+from .models import User, Post, CommentPost
 from django.utils.translation import gettext_lazy as gl
 
 
@@ -37,3 +37,17 @@ class CreatePost(forms.ModelForm):
         model = Post
         fields = ('image', 'post',)
         exclude = ('user_name', 'url', 'video', 'music')
+
+
+class UpdateUserForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ('first_name', 'last_name', 'photo', 'bio', 'sex', 'b_day')
+        exclude = ('password', 'slug')
+
+
+class AddCommentForPost(forms.ModelForm):
+    class Meta:
+        model = CommentPost
+        fields = ('comment',)
+

@@ -1,0 +1,52 @@
+<!-- Content
+============================================= -->
+<section id="content">
+  <div class="content-wrap">
+    <div class="container clearfix">
+      <div class="form-widget">
+        <div class="form-result"></div>
+        <div class="row">
+          <div class="col-lg-12">
+            <form method="post" class="row" enctype="multipart/form-data" action="" novalidate="novalidate">
+            {%csrf_token%}
+                <div class="col-6 form-group">
+                    <label for="id_first_name">Имя:</label>
+                    <input class="form-control required" type="text" name="first_name" value="{{user.first_name}}" maxlength="150" id="id_first_name">
+                </div>
+                <div class="col-6 form-group">
+                    <label for="id_last_name">Фамилия:</label>
+                    <input class="form-control required" type="text" name="last_name" value="{{user.last_name}}" maxlength="150" id="id_last_name">
+                </div>
+                <div class="col-6 form-group">
+                    <label for="id_photo"><a href=""><img src="{{user.photo.url}}" width="100" height="100"></a>  Изменить:  </label>
+                    <input type="file" name="photo" accept="image/*" id="id_photo" multiple class="file file-loading">
+                </div>
+                <div class="col-6 form-group">
+                    <label for="id_sex">Пол:</label>
+                    <select name="sex" id="id_sex" class="form-control required">
+                        <option value="">---------</option>
+                        <option value="men"> Мужчина</option>
+                        <option value="women">Женщина</option>
+                    </select>
+                </div>
+                <div class="col-12 bottommargin-sm">
+                    <label for="id_b_day">Дата рождения:</label>
+                    <input type="text" name="b_day" value="06.01.1991" required="" id="id_b_day" class="form-control datetimepicker-input datetimepicker1">
+                </div>
+                <div class="col-12">
+                    <label for="id_bio">Краткая информация:</label>
+                    <textarea name="bio" cols="10" rows="3" id="id_bio" class="form-control required"></textarea>
+                </div>
+
+                <div class="col-12">
+                      <br> <br>
+                    <button class="button button-border button-rounded button-leaf">Сохранить</button>
+                </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- #content end -->

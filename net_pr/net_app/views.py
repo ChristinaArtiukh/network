@@ -8,8 +8,9 @@ from django.views.generic import CreateView, DetailView, ListView
 from django.views.generic.edit import FormMixin, UpdateView
 from pytils.translit import slugify
 
-from .models import User, Post
-from .forms import RegistrationForm, LoginForm, AddUserForm, CreatePost
+from .models import User, Post, CommentPost
+from .forms import RegistrationForm, LoginForm, AddUserForm, CreatePost, UpdateUserForm,\
+    AddCommentForPost
 
 
 def home(request):
@@ -60,25 +61,33 @@ def add_profile(request):
     return render(request, 'user/add_profile.html', {'profile_form':profile_form})
 
 
-def profile(request, slug):
-    if request.method == 'POST':
+def profile(request, slug, post):
+    post_form = CreatePost()
+    comment_form = AddCommentForPost()
+    if request.method == 'POST' and request.POST.get('submit') == 'post':
         post_form = CreatePost(data=request.POST, files=request.FILES)
         if post_form.is_valid():
             post_form.save(commit=False)
             post_form.image = request.FILES.getlist('image')
             post_form.instance.user_name = request.user
-            print('request.user', request.user, post_form)
             post_form.save()
-            print('request.user', request.user, post_form)
+            return HttpResponseRedirect(request.path_info)
+    elif request.method == 'POST' and request.POST.get('submit') == 'comment':
+        comment_form = AddCommentForPost(data=request.POST)
+        if comment_form.is_valid():
+            comment_form.save(commit=False)
+            comment_form.user_name = request.user
+            comment_form.save()
             return HttpResponseRedirect(request.path_info)
     else:
         post_form = CreatePost()
+        comment_form = AddCommentForPost()
     context = {
         'post_form': post_form,
-        'profile': User.objects.filter(username=request.user),
-        'post': Post.objects.filter(user_name=request.user).order_by('-date'),
+        'comment_form': comment_form,
+        'profile': User.objects.filter(slug=slug),
+        'post': Post.objects.all().order_by('-date'),
     }
-    print('request.user', request.user, post_form)
     return render(request, 'user/profile.html', context)
 
 
@@ -87,4 +96,13 @@ class FriendsListView(ListView):
     template_name = 'user/friends_list.html'
     context_object_name = 'friends'
 
+
+class UpdateUserInfo(UpdateView):
+    model = User
+    template_name = 'user/update_user.html'
+    success_url = 'profile'
+    form_class = UpdateUserForm
+
+    def get_object(self, queryset=None):
+        return self.request.user
 

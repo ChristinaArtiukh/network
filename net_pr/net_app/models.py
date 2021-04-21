@@ -10,7 +10,7 @@ class User(AbstractUser):
                 ('women', 'Женщина'),
             )
     date_join = models.DateField(auto_now_add=True, verbose_name='Дата добавления')
-    phone = models.CharField(max_length=13, verbose_name='Телефон')
+    phone = models.CharField(max_length=13, verbose_name='Телефон', blank=True, null=True)
     photo = models.ImageField(upload_to='media/user/%Y/%m/%d', verbose_name='Фото', blank=True, null=True)
     bio = models.TextField(verbose_name='Краткая информация', blank=True, null=True)
     sex = models.CharField(choices=SEX_CHOICE, max_length=30, verbose_name='Пол', null=True)
@@ -26,6 +26,9 @@ class User(AbstractUser):
 
     def get_absolute_url(self):
         return reverse('profile', args=[self.slug])
+
+    def update(self):
+        return reverse('update_profile', args=[self.slug])
 
     def save(self, *args, **kwargs):
         self.slug = slugify(self.username)
@@ -44,5 +47,12 @@ class Post(models.Model):
     class Meta:
         verbose_name = 'Пост'
         verbose_name_plural = 'Посты'
+
+
+class CommentPost(models.Model):
+    post = models.ForeignKey('Post', on_delete=models.CASCADE)
+    user_name = models.ForeignKey('User', on_delete=models.CASCADE)
+    date = models.DateTimeField(auto_now_add=True)
+    comment = models.TextField(verbose_name='Комментарий', max_length=100, blank=True, null=True)
 
 
