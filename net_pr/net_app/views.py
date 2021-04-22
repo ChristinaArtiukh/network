@@ -1,6 +1,7 @@
 import os
 from django.contrib import messages
 from django.contrib.auth import login, logout
+from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponseRedirect
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
@@ -9,8 +10,8 @@ from django.views.generic.edit import FormMixin, UpdateView
 from pytils.translit import slugify
 
 from .models import User, Post, CommentPost
-from .forms import RegistrationForm, LoginForm, AddUserForm, CreatePost, UpdateUserForm,\
-    AddCommentForPost
+from .forms import RegistrationForm, LoginForm, AddUserForm, CreatePostForm, UpdateUserForm,\
+    AddCommentForPostForm
 
 
 def home(request):
@@ -58,35 +59,37 @@ def add_profile(request):
             return redirect('profile')
     else:
         profile_form = AddUserForm()
-    return render(request, 'user/add_profile.html', {'profile_form':profile_form})
+    return render(request, 'user/add_profile.html', {'profile_form': profile_form})
 
 
-def profile(request, slug, post):
-    post_form = CreatePost()
-    comment_form = AddCommentForPost()
-    if request.method == 'POST' and request.POST.get('submit') == 'post':
-        post_form = CreatePost(data=request.POST, files=request.FILES)
+def profile(request, slug):
+    post_form = CreatePostForm()
+    comment_form = AddCommentForPostForm()
+    if request.method == 'POST' and request.POST.get('submit') == 'post_form':
+        post_form = CreatePostForm(data=request.POST, files=request.FILES)
         if post_form.is_valid():
             post_form.save(commit=False)
-            post_form.image = request.FILES.getlist('image')
-            post_form.instance.user_name = request.user
+            post_form.instance.name = request.user
             post_form.save()
             return HttpResponseRedirect(request.path_info)
-    elif request.method == 'POST' and request.POST.get('submit') == 'comment':
-        comment_form = AddCommentForPost(data=request.POST)
+    elif request.method == 'POST' and request.POST.get('submit') == 'comment_form':
+        comment_form = AddCommentForPostForm(data=request.POST)
+        this_post = int(request.POST.get('post'))
         if comment_form.is_valid():
             comment_form.save(commit=False)
-            comment_form.user_name = request.user
+            comment_form.instance.name = request.user
+            comment_form.post = Post.objects.filter(pk=this_post)
             comment_form.save()
             return HttpResponseRedirect(request.path_info)
     else:
-        post_form = CreatePost()
-        comment_form = AddCommentForPost()
+        post_form = CreatePostForm()
+        comment_form = AddCommentForPostForm()
     context = {
         'post_form': post_form,
         'comment_form': comment_form,
         'profile': User.objects.filter(slug=slug),
-        'post': Post.objects.all().order_by('-date'),
+        'posts': Post.objects.all().order_by('-date'),
+        'comment': CommentPost.objects.all().order_by('-date')
     }
     return render(request, 'user/profile.html', context)
 

@@ -2,6 +2,8 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.urls import reverse
 from pytils.translit import slugify
+from mptt.fields import TreeForeignKey
+from mptt.models import MPTTModel
 
 
 class User(AbstractUser):
@@ -36,9 +38,9 @@ class User(AbstractUser):
 
 
 class Post(models.Model):
-    user_name = models.ForeignKey('User', on_delete=models.CASCADE)
+    name = models.ForeignKey('User', on_delete=models.CASCADE)
     date = models.DateTimeField(auto_now_add=True)
-    post = models.TextField(blank=True, null=True)
+    text = models.TextField(blank=True, null=True)
     image = models.ImageField(upload_to='media/post/%Y/%m/%d', blank=True, null=True)
     url = models.URLField(blank=True, null=True)
     video = models.FileField(upload_to='media/post/%Y/%m/%d', blank=True, null=True)
@@ -48,11 +50,26 @@ class Post(models.Model):
         verbose_name = 'Пост'
         verbose_name_plural = 'Посты'
 
+    def __str__(self):
+        return self.text
+
 
 class CommentPost(models.Model):
     post = models.ForeignKey('Post', on_delete=models.CASCADE)
-    user_name = models.ForeignKey('User', on_delete=models.CASCADE)
+    name = models.ForeignKey('User', on_delete=models.CASCADE)
     date = models.DateTimeField(auto_now_add=True)
     comment = models.TextField(verbose_name='Комментарий', max_length=100, blank=True, null=True)
+    parent = models.ForeignKey(
+        "self",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='children'
+    )
 
+    class Meta:
+        verbose_name = 'Коментарий'
+        verbose_name_plural = 'Комментарии'
 
+    def __str__(self):
+        return "{} - {}".format(self.name, self.comment)

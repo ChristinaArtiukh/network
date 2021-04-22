@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'net_app.apps.NetAppConfig',
     'debug_toolbar',
+    'mptt',
 ]
 
 MIDDLEWARE = [
