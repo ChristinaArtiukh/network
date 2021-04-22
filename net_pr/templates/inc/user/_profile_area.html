@@ -1,76 +1,77 @@
 {%load static%}
 <style>
-	.content-wrap {
+.comment-wrap {
     position: relative;
-    padding: 1px 0;
-    overflow: hidden;
-}
+    border: 0px solid #E5E5E5;
+    border-radius: 0px;
+    padding: 20px 20px 20px 35px;
+    }
 .col-1-5, .col-sm-1-5, .col-md-1-5, .col-lg-1-5, .col-xl-1-5 {
     position: relative;
     width: 100%;
     padding-right: 15px;
     padding-left: 800px;
+}
+.buttons {
+    float:right;
+}
 </style>
 
+<!-- Content
+============================================= -->
 <section id="content">
-<div class="content-wrap">
-<div class="container clearfix">
-<div class="row clearfix">
-<div class="col-md-12">
-	{%for profile in profile %}
-	<div class="col-md-1-5"><a href="{{ profile.update }}" class="button button-border button-border-thin button-leaf">Редактировать</a></div>
-	<div class="team team-list row align-items-center">
-		{% if profile.photo %}
-		<div class="team-image col-sm-3">
-			<img src="{{profile.photo.url}}" alt="{{profile.username}}">
-		</div>
-		{%else%}
-		<div class="team-image col-sm-3">
-			<img src="{% static 'images/icons/avatar.jpg' %}" alt="{{profile.username}}">
-		</div>
-		{% endif %}
-		<div class="team-desc col-sm-6">
-			<div class="team-title"><h4>{{profile.first_name}} {{profile.last_name}}</h4>
-				<span></span></div>
-			<div class="team-content">
-				<p>Дата рождения: {{profile.b_day}}</p>
+	<div class="content-wrap">
+		<div class="container clearfix">
+			{%for profile in profile %}
+			<div class="col-md-1-5">
+				<a href="{{ profile.update }}" class="button button-border button-border-thin button-leaf">Редактировать</a>
 			</div>
-		</div>
+			<div class="row clearfix">
+				<div class="col-md-12">
+					{% if profile.photo %}
+					<img src="{{profile.photo.url}}" class="alignleft img-circle img-thumbnail my-0" alt="Avatar" style="max-width: 84px;">
+					{%else%}
+					<img src="{% static 'images/icons/avatar.jpg' %}" class="alignleft img-circle img-thumbnail my-0" alt="Avatar" style="max-width: 84px;">
+					{% endif %}
+					<div class="heading-block border-0">
+						<h4>{{profile.first_name}} {{profile.last_name}}</h4>
+						<span></span>
 					</div>
-	<div class="heading-block border-0">
-		<br>
-		<p>{{profile.bio}}</p>
-	</div>
-	<div class="content-wrap bg-light">
-		<div class="container">
-			<div class="row justify-content-center">
-				<div class="clear"></div>
-				<div class="row clearfix">
-					<div class="tab-container">
-						<div class="tab-content clearfix" id="tab-posts">
-							<div class="card-body" style="padding: 10px;">
-								<form action=" " method="post" enctype="multipart/form-data">
-									{%csrf_token%}
-									<div class="row">
-										<div class="col-12">
-											<div class="form-group">
-												<label for="id_text">Добавить пост</label>
-												<textarea name="text" id="id_text" class="form-control required" cols="30" rows="2"></textarea>
-											</div>
+					<div class="clear"></div>
+					<br>
+					<div class="row clearfix">
+						<div class="col-lg-12">
+							<p>Дата рождения: {{profile.b_day}}</p>
+							<p>Обо мне:  {{profile.bio}}</p>
+						</div>
+					</div>
+				</div>
+				<div class="w-100 line d-block d-md-none"></div>
+			</div>
+			<div class="row clearfix">
+				<div class="col-md-12">
+					<div class="clear"></div>
+					<div class="row clearfix">
+						<div class="card-body" style="padding: 10px;">
+							<form action=" " method="post" enctype="multipart/form-data">
+								{%csrf_token%}
+								<div class="row">
+									<div class="col-12">
+										<div class="form-group">
+											<textarea name="text" id="id_text" class="form-control required" cols="30" rows="2" placeholder="Добавить пост"></textarea>
 										</div>
-										<div class="col-6 form-group">
+									</div>
+										<div class="col-10 form-group">
 											<label for="id_image">Добавить фото:</label><br>
 											<input id="id_image" type="file" name="image" multiple >
 										</div>
-										<div class="col-12 form-group">
+										<div class="col-2 form-group">
+											<br>
 											<button class="button button-3d button-black m-0" type="submit" name="submit" value="post_form">Добавить</button>
 										</div>
 								</form>
-							</div>
-							<!-- Posts
-							============================================= -->
-							<!-- Comments List
-							============================================= -->
+						</div>
+						<div class="content-wrap bg-light">
 							<ol class="commentlist clearfix">
 								{% for posts in posts %}
 								{% if posts.name_id == profile.id %}
@@ -81,20 +82,22 @@
 												<span class="comment-avatar clearfix">
 													{% if posts.name.photo %}
 													<img alt="Image" src="{{posts.name.photo.url}}" class="avatar avatar-60 photo avatar-default" width="60" height="60"></span>
-												{%else%}
-												<img alt="Image" src="{% static 'images/icons/avatar.jpg' %}" class="avatar avatar-60 photo avatar-default" width="60" height="60"></span>
-												{%endif%}
+													{%else%}
+													<img alt="Image" src="{% static 'images/icons/avatar.jpg' %}" class="avatar avatar-60 photo avatar-default" width="60" height="60"></span>
+													{%endif%}
 											</div>
 										</div>
 										<div class="comment-content clearfix">
 											<div class="comment-author">{{posts.name.first_name}}
 												<span>
-													<a href="#" title="Permalink to this comment">{{posts.date}}</a></span></div>
+													<a>{{posts.date}}</a>
+												</span>
+											</div>
 											<p>{{posts.text}}</p>
 											{%if posts.image %}
 											<img src="{{posts.image.url}}" alt="Standard Post" width="200" height="200">
 											{%endif%}
-											<br><br>
+											<br>
 										</div>
 										<div>
 											<form action=" " method="post" enctype="multipart/form-data">
@@ -103,18 +106,15 @@
 													<textarea name="comment" id="id_comment" class="form-control required" cols="30" rows="1" placeholder="Добавить комментарий"></textarea>
 												</div>
 												<input type="hidden" id="id_post" name="post" value="{{posts.id}}">
-												<div class="col-12 form-group">
-													<button  class="button button-3d button-mini button-rounded button-leaf" type="submit" name="submit" value="comment_form">Добавить</button>
-												</div>
+												<button class="button button-3d button-mini button-rounded button-leaf" type="submit" name="submit" value="comment_form">Добавить</button>
 											</form>
 										</div>
-<!--										<div class="clear"></div>-->
 										<!--children start-->
 										<ul class="children">
 											{%for comment in comment%}
 											{% if comment.post_id == posts.id%}
-											<li class="comment byuser comment-author-_smcl_admin odd alt depth-2" id="li-comment-3">
-												<div id="comment-3" class="comment-wrap clearfix">
+											<li class="comment byuser comment-author-_smcl_admin odd alt depth-2" >
+												<div class="comment-wrap clearfix">
 													<div class="comment-meta">
 														<div class="comment-author vcard">
 															<span class="comment-avatar clearfix">
@@ -133,7 +133,39 @@
 														<p>{{comment.comment}}</p>
 														<a class="comment-reply-link" href="#"><i class="icon-reply"></i></a>
 													</div>
-													<div class="clear"></div>
+													<br>
+													<form method="POST" >
+														{%csrf_token%}
+														<div class="form-group">
+															<textarea name="comment" id="id_comment" class="form-control required" cols="30" rows="1" placeholder="Добавить комментарий"></textarea>
+														</div>
+														<input type="hidden" id="id_post" name="post" value="{{posts.id}}">
+														<input type="hidden" id="id_parent" name="parent" value="{{comment.id}}">
+														<button  class="button button-3d button-mini button-rounded button-leaf" type="submit" name="submit" value="second_comment_form">Добавить</button>
+													</form>
+													{%for second_comment in second_comment%}
+													{% if comment.id == second_comment.parent_id%}
+													<div class="comment-wrap clearfix">
+														<div class="comment-meta">
+															<div class="comment-author vcard">
+																<span class="comment-avatar clearfix">
+																	{%if second_comment.name.photo%}
+																	<img alt="{{second_comment.name}}" src="{{second_comment.name.photo.url}}" class="avatar avatar-40 photo" width="40" height="40"></span>
+																	{%else%}
+																	<img alt="{{second_comment.name}}" src="{% static 'images/icons/avatar.jpg' %}" class="avatar avatar-40 photo" width="40" height="40"></span>
+																	{%endif%}
+															</div>
+														</div>
+														<div class="comment-content clearfix">
+															<div class="comment-author">
+																<a href="#" rel="external nofollow" class="url">{{second_comment.name.first_name}}</a>
+																<span>
+																	<a href="#" title="Permalink to this comment">{{second_comment.date}}</a></span></div>
+															<p>{{second_comment.comment}}</p>
+														</div>
+													</div>
+													{%endif%}
+													{%endfor%}
 												</div>
 											</li>
 											{%endif%}
@@ -141,27 +173,20 @@
 										</ul>
 										<!--children tnd-->
 									</div>
-
-												</li>
-												{%endif%}
-												{%endfor%}
-												<div class="clear"></div>
-											</ol>
-											<!-- .commentlist end -->
-										</div>
-									</div>
-								</div>
-								</div>
-							</div>
+								</li>
+								{%endif%}
+								{%endfor%}
+							</ol>
 						</div>
-</div>
-</div>
-	<div class="w-100 line d-block d-md-none"></div>
-	{%endfor%}
-</div>
-</div>
+					</div>
+				</div>
+				<div class="w-100 line d-block d-md-none"></div>
+			</div>
+			{%endfor%}
+		</div>
+	</div>
 </section>
-<br>
+
 
 
 <!-- #content end -->

@@ -52,3 +52,9 @@ class AddCommentForPostForm(forms.ModelForm):
         fields = ('comment', 'post',)
         exclude = ('name',)
 
+
+class AddCommentForCommentForm(forms.ModelForm):
+    class Meta:
+        model = CommentPost
+        fields = ('post', 'parent','comment', )
+        exclude = ('name', )

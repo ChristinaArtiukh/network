@@ -1,3 +1,4 @@
+{%load static%}
 <style>
 	.team-image > a, .team-image img {
     display: block;
@@ -15,7 +16,11 @@
 				<div class="col-lg-12">
 					<div class="team team-list row align-items-center">
 						<div class="team-image col-sm-2">
+							{%if friend.photo%}
 							<a href="{{friend.get_absolute_url}}"><img src="{{friend.photo.url}}" alt="photo" ></a>
+							{%else%}
+							<a href="{{friend.get_absolute_url}}"><img src="{% static 'images/icons/avatar.jpg' %}" alt="photo" ></a>
+							{%endif%}
 						</div>
 						<div class="team-desc col-sm-6">
 							<div class="team-title"><h5>{{friend.last_name}} {{friend.first_name}}</h5></div>

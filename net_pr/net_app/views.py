@@ -11,7 +11,7 @@ from pytils.translit import slugify
 
 from .models import User, Post, CommentPost
 from .forms import RegistrationForm, LoginForm, AddUserForm, CreatePostForm, UpdateUserForm,\
-    AddCommentForPostForm
+    AddCommentForPostForm, AddCommentForCommentForm
 
 
 def home(request):
@@ -65,6 +65,7 @@ def add_profile(request):
 def profile(request, slug):
     post_form = CreatePostForm()
     comment_form = AddCommentForPostForm()
+    second_comment_form = AddCommentForCommentForm()
     if request.method == 'POST' and request.POST.get('submit') == 'post_form':
         post_form = CreatePostForm(data=request.POST, files=request.FILES)
         if post_form.is_valid():
@@ -81,15 +82,30 @@ def profile(request, slug):
             comment_form.post = Post.objects.filter(pk=this_post)
             comment_form.save()
             return HttpResponseRedirect(request.path_info)
+    elif request.method == 'POST' and request.POST.get('submit') == 'second_comment_form':
+        second_comment_form = AddCommentForCommentForm(data=request.POST)
+        this_post = int(request.POST.get('post'))
+        this_comment = int(request.POST.get('parent'))
+        if second_comment_form.is_valid():
+            second_comment_form.save(commit=False)
+            second_comment_form.instance.name = request.user
+            second_comment_form.post = Post.objects.filter(pk=this_post)
+            second_comment_form.parent = this_comment
+            second_comment_form.save()
+            print(request.POST)
+            return HttpResponseRedirect(request.path_info)
     else:
         post_form = CreatePostForm()
         comment_form = AddCommentForPostForm()
+        second_comment_form = AddCommentForPostForm()
     context = {
         'post_form': post_form,
         'comment_form': comment_form,
+        'second_comment_form': second_comment_form,
         'profile': User.objects.filter(slug=slug),
         'posts': Post.objects.all().order_by('-date'),
-        'comment': CommentPost.objects.all().order_by('-date')
+        'comment': CommentPost.objects.filter(parent__isnull=True).order_by('-date'),
+        'second_comment': CommentPost.objects.filter(parent__isnull=False).order_by('-date')
     }
     return render(request, 'user/profile.html', context)
 
