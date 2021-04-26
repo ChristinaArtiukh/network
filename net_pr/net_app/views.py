@@ -91,7 +91,8 @@ def profile(request, slug):
     AddCommentForPostForm() - добавление комментария к посту
     AddCommentForCommentForm() - добавление комментария к комментарию
     UpdatePostForm() - редактирование поста
-    UpdateCommentPostForm()
+    UpdateCommentPostForm() - редактирование комментария
+
     '''
     post_form = CreatePostForm()
     comment_form = AddCommentForPostForm()
@@ -99,6 +100,7 @@ def profile(request, slug):
     update_post_form = UpdatePostForm()
     update_comment_form = UpdateCommentPostForm()
     this_name = User.objects.get(slug=slug)
+    # добавление поста на страницу
     if request.method == 'POST' and request.POST.get('submit') == 'post_form':
         post_form = CreatePostForm(data=request.POST, files=request.FILES)
         if post_form.is_valid():
@@ -107,6 +109,7 @@ def profile(request, slug):
             post_form.instance.name = this_name
             post_form.save()
             return HttpResponseRedirect(request.path_info)
+    #  добавление комментария к посту
     elif request.method == 'POST' and request.POST.get('submit') == 'comment_form':
         comment_form = AddCommentForPostForm(data=request.POST)
         this_post = int(request.POST.get('post'))
@@ -117,6 +120,7 @@ def profile(request, slug):
             comment_form.post = Post.objects.filter(pk=this_post)
             comment_form.save()
             return HttpResponseRedirect(request.path_info)
+    # добавление комментария к комментарию
     elif request.method == 'POST' and request.POST.get('submit') == 'second_comment_form':
         second_comment_form = AddCommentForCommentForm(data=request.POST)
         this_post = int(request.POST.get('post'))
@@ -129,6 +133,7 @@ def profile(request, slug):
             second_comment_form.instance.name = this_name
             second_comment_form.save()
             return HttpResponseRedirect(request.path_info)
+    # редактирование поста
     elif request.method == 'POST' and request.POST.get('submit') == 'update_post_form':
         this_post = int(request.POST.get('post'))
         instance = get_object_or_404(Post, pk=this_post)
@@ -137,19 +142,21 @@ def profile(request, slug):
             update_post_form.save()
             print(instance, request.POST)
             return HttpResponseRedirect(request.path_info)
-    elif request.method == 'POST' and request.POST.get('submit') == 'delete_post_form':
-        this_post = int(request.POST.get('post'))
-        Post.objects.filter(pk=this_post).delete()
-        return HttpResponseRedirect(request.path_info)
+    # редактирование комментария - не работает
     elif request.method == 'POST' and request.POST.get('submit') == 'update_comment_form':
-        this_comment = int(request.POST.get('comment'))
-        instance = get_object_or_404(CommentPost, pk=this_comment)
+        this_post = int(request.POST.get('comment'))
+        instance = get_object_or_404(CommentPost, pk=this_post)
         update_comment_form = UpdateCommentPostForm(data=request.POST, instance=instance)
-        print(this_comment, request.POST)
         if update_comment_form.is_valid():
             update_comment_form.save()
             print(instance, request.POST)
             return HttpResponseRedirect(request.path_info)
+    # удаление поста
+    elif request.method == 'POST' and request.POST.get('submit') == 'delete_post_form':
+        this_post = int(request.POST.get('post'))
+        Post.objects.filter(pk=this_post).delete()
+        return HttpResponseRedirect(request.path_info)
+    # удаление родительского и дочернего комментария
     elif request.method == 'POST' and request.POST.get('submit') == 'delete_comment_form'\
             or request.POST.get('submit') == 'delete_second_comment_form':
         this_comment = int(request.POST.get('comment'))
