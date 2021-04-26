@@ -12,9 +12,13 @@
     padding-right: 15px;
     padding-left: 800px;
 }
-.buttons {
-    float:right;
-}
+
+.comment-wrap {
+    position: relative;
+    border: 0px solid #E5E5E5;
+    border-radius: 0px;
+    padding: 10px 10px 0px 35px;
+    }
 </style>
 
 <!-- Content
@@ -22,10 +26,9 @@
 <section id="content">
 	<div class="content-wrap">
 		<div class="container clearfix">
+<!-- Данные профиля
+============================================= -->
 			{%for profile in profile %}
-			<div class="col-md-1-5">
-				<a href="{{ profile.update }}" class="button button-border button-border-thin button-leaf">Редактировать</a>
-			</div>
 			<div class="row clearfix">
 				<div class="col-md-12">
 					{% if profile.photo %}
@@ -35,7 +38,9 @@
 					{% endif %}
 					<div class="heading-block border-0">
 						<h4>{{profile.first_name}} {{profile.last_name}}</h4>
-						<span></span>
+							{% if profile.id == user.id%}
+								<a href="{{ profile.update }}">Редактировать</a>
+							{%endif%}
 					</div>
 					<div class="clear"></div>
 					<br>
@@ -53,6 +58,8 @@
 					<div class="clear"></div>
 					<div class="row clearfix">
 						<div class="card-body" style="padding: 10px;">
+<!-- Добавление поста
+============================================= -->
 							<form action=" " method="post" enctype="multipart/form-data">
 								{%csrf_token%}
 								<div class="row">
@@ -61,17 +68,19 @@
 											<textarea name="text" id="id_text" class="form-control required" cols="30" rows="2" placeholder="Добавить пост"></textarea>
 										</div>
 									</div>
-										<div class="col-10 form-group">
-											<label for="id_image">Добавить фото:</label><br>
-											<input id="id_image" type="file" name="image" multiple >
-										</div>
-										<div class="col-2 form-group">
-											<br>
-											<button class="button button-3d button-black m-0" type="submit" name="submit" value="post_form">Добавить</button>
-										</div>
-								</form>
+									<div class="col-10 form-group">
+										<label for="id_image">Добавить фото:</label><br>
+										<input id="id_image" type="file" name="image" multiple >
+									</div>
+									<div class="col-2 form-group">
+										<br>
+										<button class="button button-3d button-black m-0" type="submit" name="submit" value="post_form">Добавить</button>
+									</div>
+							</form>
 						</div>
-						<div class="content-wrap bg-light">
+						<div>
+							<!-- Список постов
+============================================= -->
 							<ol class="commentlist clearfix">
 								{% for posts in posts %}
 								{% if posts.name_id == profile.id %}
@@ -79,16 +88,61 @@
 									<div  class="comment-wrap clearfix">
 										<div class="comment-meta">
 											<div class="comment-author vcard">
-												<span class="comment-avatar clearfix">
-													{% if posts.name.photo %}
-													<img alt="Image" src="{{posts.name.photo.url}}" class="avatar avatar-60 photo avatar-default" width="60" height="60"></span>
+												<a href="{{posts.poster.get_absolute_url}}">
+													<span class="comment-avatar clearfix">
+													{% if posts.poster.photo %}
+													<img alt="Image" src="{{posts.poster.photo.url}}" class="avatar avatar-60 photo avatar-default" width="60" height="60"></span>
 													{%else%}
 													<img alt="Image" src="{% static 'images/icons/avatar.jpg' %}" class="avatar avatar-60 photo avatar-default" width="60" height="60"></span>
 													{%endif%}
+												</a>
 											</div>
 										</div>
 										<div class="comment-content clearfix">
-											<div class="comment-author">{{posts.name.first_name}}
+											<div class="comment-author">
+												<a href="{{posts.poster.get_absolute_url}}">{{posts.poster.first_name}}</a>
+												<!-- Редактирование поста
+============================================= -->
+												{% if posts.poster_id == user.id%}
+												<i class="icon-line-edit" data-toggle="modal" data-target="#modal-update{{posts.id}}" ></i>
+												<div class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true" id="modal-update{{posts.id}}">
+													<div class="modal-dialog modal-lg">
+														<div class="modal-body">
+															<div class="modal-content">
+																<div class="modal-header">
+																	<h4 class="modal-title" id="myModalLabel">Редактировать пост {{posts.post}}</h4>
+																	<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+																</div>
+																<div class="modal-body">
+																	<form method="post" enctype="multipart/form-data">
+																		{%csrf_token%}
+																		<div class="row">
+																			<div class="col-12">
+																				<div class="form-group">
+																					<textarea name="text" id="id_text" class="form-control required" cols="30" rows="2">{{posts.text}}</textarea>
+																				</div>
+																			</div>
+																				<div class="col-10 form-group">
+																					<label for="id_image">Редактировать фото:</label><br>
+																					{%if posts.image %}
+																					<img src="{{posts.image.url}}" width="100" height="100">
+																					{%endif%}
+																					<input id="id_image" type="file" name="image" multiple >
+																				</div>
+																			<input type="hidden" id="id_post" name="post" value="{{posts.id}}">
+																		</div>
+																		<div class="modal-footer">
+																			<button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
+																			<button class="btn btn-primary" type="submit" name="submit" value="update_post_form">Сохратить</button>
+																		</div>
+																	</form>
+																</div>
+
+															</div>
+														</div>
+													</div>
+												</div>
+												{%endif%}
 												<span>
 													<a>{{posts.date}}</a>
 												</span>
@@ -97,8 +151,35 @@
 											{%if posts.image %}
 											<img src="{{posts.image.url}}" alt="Standard Post" width="200" height="200">
 											{%endif%}
+											<!-- Удаление поста
+============================================= -->
+											<a class="comment-reply-link">
+												<form method="post" >
+													{%csrf_token%}
+													<i class="icon-line-cross" data-toggle="modal" data-target="#modal-delete{{posts.id}}"></i>
+													<div class="modal fade bs-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true" id="modal-delete{{posts.id}}">
+														<div class="modal-dialog modal-sm">
+															<div class="modal-body">
+																<div class="modal-content">
+																	<div class="modal-header">
+																		<h4 class="modal-title" id="myModalLabel">Удаление</h4>
+																		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+																	</div>
+																	<input type="hidden" id="id_post" name="post" value="{{posts.id}}">
+																	<div class="modal-footer">
+																		<button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
+																		<button class="btn btn-primary" type="submit" name="submit" value="delete_post_form">Удалить</button>
+																	</div>
+																</div>
+															</div>
+														</div>
+													</div>
+												</form>
+											</a>
 											<br>
 										</div>
+										<!-- Добавление комментария
+============================================= -->
 										<div>
 											<form action=" " method="post" enctype="multipart/form-data">
 												{%csrf_token%}
@@ -110,6 +191,8 @@
 											</form>
 										</div>
 										<!--children start-->
+										<!-- Список комментариев
+============================================= -->
 										<ul class="children">
 											{%for comment in comment%}
 											{% if comment.post_id == posts.id%}
@@ -117,24 +200,97 @@
 												<div class="comment-wrap clearfix">
 													<div class="comment-meta">
 														<div class="comment-author vcard">
+															<a href="{{comment.poster.get_absolute_url}}" >
 															<span class="comment-avatar clearfix">
-																{%if comment.name.photo%}
-																<img alt="{{comment.name}}" src="{{comment.name.photo.url}}" class="avatar avatar-40 photo" width="40" height="40"></span>
+																{%if comment.poster.photo%}
+																<img alt="{{comment.poster}}" src="{{comment.poster.photo.url}}" class="avatar avatar-40 photo" width="40" height="40"></span>
 																{%else%}
-																<img alt="{{comment.name}}" src="{% static 'images/icons/avatar.jpg' %}" class="avatar avatar-40 photo" width="40" height="40"></span>
+																<img alt="{{comment.poster}}" src="{% static 'images/icons/avatar.jpg' %}" class="avatar avatar-40 photo" width="40" height="40"></span>
 																{%endif%}
+															</a>
 														</div>
 													</div>
 													<div class="comment-content clearfix">
 														<div class="comment-author">
-															<a href="#" rel="external nofollow" class="url">{{comment.name.first_name}}</a>
+															<a href="{{comment.poster.get_absolute_url}}" rel="external nofollow" class="url">{{comment.poster.first_name}}</a>
+
+
+									<!-- Редактирование комментария
+============================================= -->
+															{% if posts.poster_id == user.id%}
+															<i class="icon-line-edit-3" data-toggle="modal" data-target="#modal-comment-update{{comment.id}}" ></i>
+															<div class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true" id="modal-comment-update{{comment.id}}">
+																<div class="modal-dialog modal-lg">
+																	<div class="modal-body">
+																		<div class="modal-content">
+																			<div class="modal-header">
+																				<h4 class="modal-title" id="myModalLabel">Редактировать комментарий</h4>
+																				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+																			</div>
+																			<div class="modal-body">
+																				<form method="post" enctype="multipart/form-data">
+																					{%csrf_token%}
+																					<div class="row">
+																						<div class="col-12">
+																							<div class="form-group">
+																								<textarea name="text" id="id_text" class="form-control required" cols="30" rows="2">{{comment.comment}}</textarea>
+																							</div>
+																						</div>
+<!--																							<div class="col-10 form-group">-->
+<!--																								<label for="id_image">Редактировать фото:</label><br>-->
+<!--																								<input id="id_image" type="file" name="image" multiple >-->
+<!--																							</div>-->
+																						<input  id="id_comment" name="comment" value="{{comment.id}}">
+																					</div>
+																					<div class="modal-footer">
+																						<button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
+																						<button class="btn btn-primary" type="submit" name="submit" value="update_comment_form">Сохратить</button>
+																					</div>
+																				</form>
+																			</div>
+
+																		</div>
+																	</div>
+																</div>
+															</div>
+															{%endif%}
+
+
+
+
 															<span>
 																<a href="#" title="Permalink to this comment">{{comment.date}}</a></span></div>
 														<p>{{comment.comment}}</p>
-														<a class="comment-reply-link" href="#"><i class="icon-reply"></i></a>
+														<!-- Удаление комментария
+============================================= -->
+													<a class="comment-reply-link">
+														<form method="post" >
+															{%csrf_token%}
+															<i class="icon-line-cross" data-toggle="modal" data-target="#modal-comment-delete{{comment.id}}"></i>
+															<div class="modal fade bs-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true" id="modal-comment-delete{{comment.id}}">
+																<div class="modal-dialog modal-sm">
+																	<div class="modal-body">
+																		<div class="modal-content">
+																			<div class="modal-header">
+																				<h4 class="modal-title" id="myModalLabel">Удаление</h4>
+																				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+																			</div>
+																			<input type="hidden" id="id_comment" name="comment" value="{{comment.id}}">
+																			<div class="modal-footer">
+																				<button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
+																				<button class="btn btn-primary" type="submit" name="submit" value="delete_comment_form">Удалить</button>
+																			</div>
+																		</div>
+																	</div>
+																</div>
+															</div>
+														</form>
+													</a>
 													</div>
 													<br>
-													<form method="POST" >
+													<!-- Список комментариев к комментариям
+============================================= -->
+													<form method="POST">
 														{%csrf_token%}
 														<div class="form-group">
 															<textarea name="comment" id="id_comment" class="form-control required" cols="30" rows="1" placeholder="Добавить комментарий"></textarea>
@@ -149,19 +305,89 @@
 														<div class="comment-meta">
 															<div class="comment-author vcard">
 																<span class="comment-avatar clearfix">
-																	{%if second_comment.name.photo%}
-																	<img alt="{{second_comment.name}}" src="{{second_comment.name.photo.url}}" class="avatar avatar-40 photo" width="40" height="40"></span>
+																	{%if second_comment.poster.photo%}
+																	<img alt="{{second_comment.poster}}" src="{{second_comment.poster.photo.url}}" class="avatar avatar-40 photo" width="40" height="40"></span>
 																	{%else%}
-																	<img alt="{{second_comment.name}}" src="{% static 'images/icons/avatar.jpg' %}" class="avatar avatar-40 photo" width="40" height="40"></span>
+																	<img alt="{{second_comment.poster}}" src="{% static 'images/icons/avatar.jpg' %}" class="avatar avatar-40 photo" width="40" height="40"></span>
 																	{%endif%}
 															</div>
 														</div>
 														<div class="comment-content clearfix">
 															<div class="comment-author">
-																<a href="#" rel="external nofollow" class="url">{{second_comment.name.first_name}}</a>
+																<a href="#" rel="external nofollow" class="url">{{second_comment.poster.first_name}}</a>
+
+
+
+															<!-- Редактирование комментария
+============================================= -->
+															{% if posts.poster_id == user.id%}
+															<i class="icon-line-edit-3" data-toggle="modal" data-target="#modal-second-comment-update{{second_comment.id}}" ></i>
+															<div class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true" id="modal-second-comment-update{{second_comment.id}}">
+																<div class="modal-dialog modal-lg">
+																	<div class="modal-body">
+																		<div class="modal-content">
+																			<div class="modal-header">
+																				<h4 class="modal-title" id="myModalLabel">Редактировать комментарий</h4>
+																				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+																			</div>
+																			<div class="modal-body">
+																				<form method="post" enctype="multipart/form-data">
+																					{%csrf_token%}
+																					<div class="row">
+																						<div class="col-12">
+																							<div class="form-group">
+																								<textarea name="text" id="id_text" class="form-control required" cols="30" rows="2">{{second_comment.comment}}</textarea>
+																							</div>
+																						</div>
+<!--																							<div class="col-10 form-group">-->
+<!--																								<label for="id_image">Редактировать фото:</label><br>-->
+<!--																								<input id="id_image" type="file" name="image" multiple >-->
+<!--																							</div>-->
+																						<input  id="id_comment" name="comment" value="{{second_comment.id}}">
+																					</div>
+																					<div class="modal-footer">
+																						<button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
+																						<button class="btn btn-primary" type="submit" name="submit" value="update_second_comment_form">Сохратить</button>
+																					</div>
+																				</form>
+																			</div>
+
+																		</div>
+																	</div>
+																</div>
+															</div>
+															{%endif%}
+
+
+
 																<span>
 																	<a href="#" title="Permalink to this comment">{{second_comment.date}}</a></span></div>
 															<p>{{second_comment.comment}}</p>
+						<!-- Удаление комментария
+============================================= -->
+															<a class="comment-reply-link">
+																<form method="post" >
+																	{%csrf_token%}
+																	<i class="icon-line-cross" data-toggle="modal" data-target="#modal-second-comment-delete{{second_comment.id}}"></i>
+																	<div class="modal fade bs-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true" id="modal-second-comment-delete{{second_comment.id}}">
+																		<div class="modal-dialog modal-sm">
+																			<div class="modal-body">
+																				<div class="modal-content">
+																					<div class="modal-header">
+																						<h4 class="modal-title" id="myModalLabel">Удаление комментария</h4>
+																						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+																					</div>
+																					<input type="hidden" id="id_comment" name="comment" value="{{second_comment.id}}">
+																					<div class="modal-footer">
+																						<button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
+																						<button class="btn btn-primary" type="submit" name="submit" value="delete_second_comment_form">Удалить</button>
+																					</div>
+																				</div>
+																			</div>
+																		</div>
+																	</div>
+																</form>
+															</a>
 														</div>
 													</div>
 													{%endif%}
@@ -186,7 +412,5 @@
 		</div>
 	</div>
 </section>
-
-
 
 <!-- #content end -->

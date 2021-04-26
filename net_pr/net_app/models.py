@@ -38,13 +38,15 @@ class User(AbstractUser):
 
 
 class Post(models.Model):
-    name = models.ForeignKey('User', on_delete=models.CASCADE)
+    name = models.ForeignKey('User', on_delete=models.CASCADE, related_name='user')
+    poster = models.ForeignKey('User', on_delete=models.CASCADE, related_name='poster')
     date = models.DateTimeField(auto_now_add=True)
     text = models.TextField(blank=True, null=True)
     image = models.ImageField(upload_to='media/post/%Y/%m/%d', blank=True, null=True)
     url = models.URLField(blank=True, null=True)
     video = models.FileField(upload_to='media/post/%Y/%m/%d', blank=True, null=True)
     music = models.FileField(upload_to='media/post/%Y/%m/%d', blank=True, null=True)
+
 
     class Meta:
         verbose_name = 'Пост'
@@ -56,7 +58,8 @@ class Post(models.Model):
 
 class CommentPost(models.Model):
     post = models.ForeignKey('Post', on_delete=models.CASCADE)
-    name = models.ForeignKey('User', on_delete=models.CASCADE)
+    name = models.ForeignKey('User', on_delete=models.CASCADE, related_name='comment_user')
+    poster = models.ForeignKey('User', on_delete=models.CASCADE, related_name='comment_poster')
     date = models.DateTimeField(auto_now_add=True)
     comment = models.TextField(verbose_name='Комментарий', max_length=100, blank=True, null=True)
     parent = models.ForeignKey(

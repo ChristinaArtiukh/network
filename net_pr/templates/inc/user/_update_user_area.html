@@ -29,21 +29,13 @@
                     </a>  Изменить:  </label>
                     <input type="file" name="photo" accept="image/*" id="id_photo" multiple class="file file-loading">
                 </div>
-                <div class="col-6 form-group">
-                    <label for="id_sex">Пол:</label>
-                    <select name="sex" id="id_sex" class="form-control required">
-                        <option value="">---------</option>
-                        <option value="men"> Мужчина</option>
-                        <option value="women">Женщина</option>
-                    </select>
-                </div>
                 <div class="col-12 bottommargin-sm">
                     <label for="id_b_day">Дата рождения:</label>
                     <input type="text" name="b_day" value="06.01.1991" required="" id="id_b_day" class="form-control datetimepicker-input datetimepicker1">
                 </div>
                 <div class="col-12">
                     <label for="id_bio">Краткая информация:</label>
-                    <textarea name="bio" cols="10" rows="3" id="id_bio" class="form-control required"></textarea>
+                    <textarea name="bio" cols="10" rows="3" id="id_bio" class="form-control required">{{user.bio}}</textarea>
                 </div>
 
                 <div class="col-12">

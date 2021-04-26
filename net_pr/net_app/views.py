@@ -11,7 +11,7 @@ from pytils.translit import slugify
 
 from .models import User, Post, CommentPost
 from .forms import RegistrationForm, LoginForm, AddUserForm, CreatePostForm, UpdateUserForm,\
-    AddCommentForPostForm, AddCommentForCommentForm
+    AddCommentForPostForm, AddCommentForCommentForm, UpdatePostForm, UpdateCommentPostForm
 
 
 def home(request):
@@ -22,11 +22,17 @@ def home(request):
 
 
 def user_logout(request):
+    '''
+    выход из учетки пользователя
+    '''
     logout(request)
     return redirect('registration')
 
 
 def registration(request):
+    '''
+    Регистрация пользователя
+    '''
     log_form = LoginForm
     reg_form = RegistrationForm
     if request.method == "POST" and request.POST.get('submit') == 'login':
@@ -50,6 +56,9 @@ def registration(request):
 
 
 def add_profile(request):
+    '''
+    Добавление данных к пользователю
+    '''
     if request.method == 'POST':
         profile_form = AddUserForm(data=request.POST, files=request.FILES, instance=request.user)
         if profile_form.is_valid():
@@ -62,15 +71,40 @@ def add_profile(request):
     return render(request, 'user/add_profile.html', {'profile_form': profile_form})
 
 
+class UpdateUserInfo(UpdateView):
+    '''
+    Редактированик данных пользователя
+    '''
+    model = User
+    template_name = 'user/update_user.html'
+    success_url = 'profile'
+    form_class = UpdateUserForm
+
+    def get_object(self, queryset=None):
+        return self.request.user
+
+
 def profile(request, slug):
+    '''
+    Страница пользователя:
+    CreatePostForm() - добавление поста на страницу
+    AddCommentForPostForm() - добавление комментария к посту
+    AddCommentForCommentForm() - добавление комментария к комментарию
+    UpdatePostForm() - редактирование поста
+    UpdateCommentPostForm()
+    '''
     post_form = CreatePostForm()
     comment_form = AddCommentForPostForm()
     second_comment_form = AddCommentForCommentForm()
+    update_post_form = UpdatePostForm()
+    update_comment_form = UpdateCommentPostForm()
+    this_name = User.objects.get(slug=slug)
     if request.method == 'POST' and request.POST.get('submit') == 'post_form':
         post_form = CreatePostForm(data=request.POST, files=request.FILES)
         if post_form.is_valid():
             post_form.save(commit=False)
-            post_form.instance.name = request.user
+            post_form.instance.poster = request.user
+            post_form.instance.name = this_name
             post_form.save()
             return HttpResponseRedirect(request.path_info)
     elif request.method == 'POST' and request.POST.get('submit') == 'comment_form':
@@ -78,7 +112,8 @@ def profile(request, slug):
         this_post = int(request.POST.get('post'))
         if comment_form.is_valid():
             comment_form.save(commit=False)
-            comment_form.instance.name = request.user
+            comment_form.instance.poster = request.user
+            comment_form.instance.name = this_name
             comment_form.post = Post.objects.filter(pk=this_post)
             comment_form.save()
             return HttpResponseRedirect(request.path_info)
@@ -88,20 +123,50 @@ def profile(request, slug):
         this_comment = int(request.POST.get('parent'))
         if second_comment_form.is_valid():
             second_comment_form.save(commit=False)
-            second_comment_form.instance.name = request.user
+            second_comment_form.instance.poster = request.user
             second_comment_form.post = Post.objects.filter(pk=this_post)
             second_comment_form.parent = this_comment
+            second_comment_form.instance.name = this_name
             second_comment_form.save()
-            print(request.POST)
             return HttpResponseRedirect(request.path_info)
+    elif request.method == 'POST' and request.POST.get('submit') == 'update_post_form':
+        this_post = int(request.POST.get('post'))
+        instance = get_object_or_404(Post, pk=this_post)
+        update_post_form = UpdatePostForm(data=request.POST, instance=instance, files=request.FILES)
+        if update_post_form.is_valid():
+            update_post_form.save()
+            print(instance, request.POST)
+            return HttpResponseRedirect(request.path_info)
+    elif request.method == 'POST' and request.POST.get('submit') == 'delete_post_form':
+        this_post = int(request.POST.get('post'))
+        Post.objects.filter(pk=this_post).delete()
+        return HttpResponseRedirect(request.path_info)
+    elif request.method == 'POST' and request.POST.get('submit') == 'update_comment_form':
+        this_comment = int(request.POST.get('comment'))
+        instance = get_object_or_404(CommentPost, pk=this_comment)
+        update_comment_form = UpdateCommentPostForm(data=request.POST, instance=instance)
+        print(this_comment, request.POST)
+        if update_comment_form.is_valid():
+            update_comment_form.save()
+            print(instance, request.POST)
+            return HttpResponseRedirect(request.path_info)
+    elif request.method == 'POST' and request.POST.get('submit') == 'delete_comment_form'\
+            or request.POST.get('submit') == 'delete_second_comment_form':
+        this_comment = int(request.POST.get('comment'))
+        CommentPost.objects.filter(pk=this_comment).delete()
+        return HttpResponseRedirect(request.path_info)
     else:
         post_form = CreatePostForm()
         comment_form = AddCommentForPostForm()
         second_comment_form = AddCommentForPostForm()
+        update_post_form = UpdatePostForm()
+        update_comment_form = UpdateCommentPostForm()
     context = {
         'post_form': post_form,
         'comment_form': comment_form,
         'second_comment_form': second_comment_form,
+        'update_post_form': update_post_form,
+        'update_comment_form': update_comment_form,
         'profile': User.objects.filter(slug=slug),
         'posts': Post.objects.all().order_by('-date'),
         'comment': CommentPost.objects.filter(parent__isnull=True).order_by('-date'),
@@ -116,12 +181,5 @@ class FriendsListView(ListView):
     context_object_name = 'friends'
 
 
-class UpdateUserInfo(UpdateView):
-    model = User
-    template_name = 'user/update_user.html'
-    success_url = 'profile'
-    form_class = UpdateUserForm
 
-    def get_object(self, queryset=None):
-        return self.request.user
 

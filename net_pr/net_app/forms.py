@@ -35,8 +35,8 @@ class AddUserForm(forms.ModelForm):
 class UpdateUserForm(forms.ModelForm):
     class Meta:
         model = User
-        fields = ('first_name', 'last_name', 'photo', 'bio', 'sex', 'b_day')
-        exclude = ('password', 'slug')
+        fields = ('first_name', 'last_name', 'photo', 'bio', 'b_day')
+        exclude = ('password', 'sex', 'slug')
 
 
 class CreatePostForm(forms.ModelForm):
@@ -50,11 +50,24 @@ class AddCommentForPostForm(forms.ModelForm):
     class Meta:
         model = CommentPost
         fields = ('comment', 'post',)
-        exclude = ('name',)
+        exclude = ('name', 'poster')
 
 
 class AddCommentForCommentForm(forms.ModelForm):
     class Meta:
         model = CommentPost
-        fields = ('post', 'parent','comment', )
+        fields = ('post', 'parent', 'comment', )
         exclude = ('name', )
+
+
+class UpdatePostForm(forms.ModelForm):
+    class Meta:
+        model = Post
+        fields = ('text', 'image')
+
+
+class UpdateCommentPostForm(forms.ModelForm):
+    class Meta:
+        model = CommentPost
+        exclude = ('comment', )
+
