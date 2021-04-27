@@ -2,8 +2,6 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.urls import reverse
 from pytils.translit import slugify
-from mptt.fields import TreeForeignKey
-from mptt.models import MPTTModel
 
 
 class User(AbstractUser):
@@ -53,7 +51,7 @@ class Post(models.Model):
         verbose_name_plural = 'Посты'
 
     def __str__(self):
-        return self.text
+        return "{} - {}".format(self.name, self.text)
 
 
 class CommentPost(models.Model):

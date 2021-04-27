@@ -1,17 +1,13 @@
-import os
 from django.contrib import messages
 from django.contrib.auth import login, logout
-from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponseRedirect
 from django.shortcuts import render, redirect, get_object_or_404
-from django.urls import reverse_lazy
 from django.views.generic import CreateView, DetailView, ListView
 from django.views.generic.edit import FormMixin, UpdateView
-from pytils.translit import slugify
-
 from .models import User, Post, CommentPost
 from .forms import RegistrationForm, LoginForm, AddUserForm, CreatePostForm, UpdateUserForm,\
-    AddCommentForPostForm, AddCommentForCommentForm, UpdatePostForm, UpdateCommentPostForm
+    AddCommentForPostForm, AddCommentForCommentForm, UpdatePostForm, UpdateCommentPostForm,\
+    UpdateSecondCommentPostForm
 
 
 def home(request):
@@ -99,6 +95,7 @@ def profile(request, slug):
     second_comment_form = AddCommentForCommentForm()
     update_post_form = UpdatePostForm()
     update_comment_form = UpdateCommentPostForm()
+    update_second_comment_form = UpdateSecondCommentPostForm()
     this_name = User.objects.get(slug=slug)
     # добавление поста на страницу
     if request.method == 'POST' and request.POST.get('submit') == 'post_form':
@@ -142,14 +139,26 @@ def profile(request, slug):
             update_post_form.save()
             print(instance, request.POST)
             return HttpResponseRedirect(request.path_info)
-    # редактирование комментария - не работает
-    elif request.method == 'POST' and request.POST.get('submit') == 'update_comment_form':
-        this_post = int(request.POST.get('comment'))
-        instance = get_object_or_404(CommentPost, pk=this_post)
+    # редактирование комментария
+    elif request.method == 'POST' and request.POST.get('submit') == 'update_comment_form' \
+            or request.POST.get('submit') == 'update_second_comment_form':
+        this_comment = request.POST.get('id')
+        instance = get_object_or_404(CommentPost, pk=this_comment)
         update_comment_form = UpdateCommentPostForm(data=request.POST, instance=instance)
+        print(instance, request.POST)
         if update_comment_form.is_valid():
             update_comment_form.save()
-            print(instance, request.POST)
+            print(instance, this_comment, request.POST)
+            return HttpResponseRedirect(request.path_info)
+    # редактирование комментария на комментарий
+    elif request.method == 'POST' and request.POST.get('submit') == 'update_second_comment_form':
+        this_comment = request.POST.get('id')
+        instance = get_object_or_404(CommentPost, pk=this_comment, )
+        update_second_comment_form = UpdateSecondCommentPostForm(data=request.POST, instance=instance)
+        print(instance, request.POST)
+        if update_second_comment_form.is_valid():
+            update_second_comment_form.save()
+            print(instance, this_comment, request.POST)
             return HttpResponseRedirect(request.path_info)
     # удаление поста
     elif request.method == 'POST' and request.POST.get('submit') == 'delete_post_form':
@@ -168,12 +177,14 @@ def profile(request, slug):
         second_comment_form = AddCommentForPostForm()
         update_post_form = UpdatePostForm()
         update_comment_form = UpdateCommentPostForm()
+        update_second_comment_form = UpdateSecondCommentPostForm()
     context = {
         'post_form': post_form,
         'comment_form': comment_form,
         'second_comment_form': second_comment_form,
         'update_post_form': update_post_form,
         'update_comment_form': update_comment_form,
+        'update_second_comment_form': update_second_comment_form,
         'profile': User.objects.filter(slug=slug),
         'posts': Post.objects.all().order_by('-date'),
         'comment': CommentPost.objects.filter(parent__isnull=True).order_by('-date'),

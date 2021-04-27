@@ -219,12 +219,12 @@
 ============================================= -->
 															{% if posts.poster_id == user.id%}
 															<i class="icon-line-edit-3" data-toggle="modal" data-target="#modal-comment-update{{comment.id}}" ></i>
-															<div class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true" id="modal-comment-update{{comment.id}}">
+															<div class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myCommentModalLabel" aria-hidden="true" id="modal-comment-update{{comment.id}}">
 																<div class="modal-dialog modal-lg">
 																	<div class="modal-body">
 																		<div class="modal-content">
 																			<div class="modal-header">
-																				<h4 class="modal-title" id="myModalLabel">Редактировать комментарий</h4>
+																				<h4 class="modal-title" id="myCommentModalLabel">Редактировать комментарий</h4>
 																				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
 																			</div>
 																			<div class="modal-body">
@@ -233,14 +233,14 @@
 																					<div class="row">
 																						<div class="col-12">
 																							<div class="form-group">
-																								<textarea name="text" id="id_text" class="form-control required" cols="30" rows="2">{{comment.comment}}</textarea>
+																								<textarea name="comment" id="id_comment" class="form-control required" cols="30" rows="2">{{comment.comment}}</textarea>
 																							</div>
 																						</div>
 <!--																							<div class="col-10 form-group">-->
 <!--																								<label for="id_image">Редактировать фото:</label><br>-->
 <!--																								<input id="id_image" type="file" name="image" multiple >-->
 <!--																							</div>-->
-																						<input  id="id_comment" name="comment" value="{{comment.id}}">
+																						<input  type="hidden" id="id_id" name="id" value="{{comment.id}}">
 																					</div>
 																					<div class="modal-footer">
 																						<button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
@@ -275,7 +275,7 @@
 																				<h4 class="modal-title" id="myModalLabel">Удаление</h4>
 																				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
 																			</div>
-																			<input type="hidden" id="id_comment" name="comment" value="{{comment.id}}">
+																			<input type="hidden" id="id_id" name="id" value="{{comment.id}}">
 																			<div class="modal-footer">
 																				<button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
 																				<button class="btn btn-primary" type="submit" name="submit" value="delete_comment_form">Удалить</button>
@@ -322,28 +322,27 @@
 ============================================= -->
 															{% if posts.poster_id == user.id%}
 															<i class="icon-line-edit-3" data-toggle="modal" data-target="#modal-second-comment-update{{second_comment.id}}" ></i>
-															<div class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true" id="modal-second-comment-update{{second_comment.id}}">
+															<div class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="mySecondCommentModalLabel" aria-hidden="true" id="modal-second-comment-update{{second_comment.id}}">
 																<div class="modal-dialog modal-lg">
 																	<div class="modal-body">
 																		<div class="modal-content">
 																			<div class="modal-header">
-																				<h4 class="modal-title" id="myModalLabel">Редактировать комментарий</h4>
+																				<h4 class="modal-title" id="mySecondCommentModalLabel">Редактировать комментарий</h4>
 																				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
 																			</div>
 																			<div class="modal-body">
 																				<form method="post" enctype="multipart/form-data">
 																					{%csrf_token%}
 																					<div class="row">
+<!--																						{{update_second_comment_form.as_p}}-->
 																						<div class="col-12">
-																							<div class="form-group">
-																								<textarea name="text" id="id_text" class="form-control required" cols="30" rows="2">{{second_comment.comment}}</textarea>
-																							</div>
+																							<textarea class="form-control required" cols="30" rows="2" name="comment" cols="40" rows="10" maxlength="100" id="id_comment">{{second_comment.comment}}</textarea>
 																						</div>
 <!--																							<div class="col-10 form-group">-->
 <!--																								<label for="id_image">Редактировать фото:</label><br>-->
 <!--																								<input id="id_image" type="file" name="image" multiple >-->
 <!--																							</div>-->
-																						<input  id="id_comment" name="comment" value="{{second_comment.id}}">
+																						<input  type="hidden" id="id_id" name="id" value="{{second_comment.id}}">
 																					</div>
 																					<div class="modal-footer">
 																						<button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
@@ -377,7 +376,7 @@
 																						<h4 class="modal-title" id="myModalLabel">Удаление комментария</h4>
 																						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
 																					</div>
-																					<input type="hidden" id="id_comment" name="comment" value="{{second_comment.id}}">
+																					<input type="hidden" id="id_id" name="id" value="{{second_comment.id}}">
 																					<div class="modal-footer">
 																						<button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
 																						<button class="btn btn-primary" type="submit" name="submit" value="delete_second_comment_form">Удалить</button>

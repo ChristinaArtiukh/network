@@ -69,5 +69,10 @@ class UpdatePostForm(forms.ModelForm):
 class UpdateCommentPostForm(forms.ModelForm):
     class Meta:
         model = CommentPost
-        exclude = ('comment', )
+        fields = ('comment', )
 
+
+class UpdateSecondCommentPostForm(forms.ModelForm):
+    class Meta:
+        model = CommentPost
+        fields = ('comment', )
