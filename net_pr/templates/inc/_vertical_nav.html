@@ -129,9 +129,28 @@
 		<nav>
 			{%if request.user.is_authenticated%}
 			<ul>
+				<li><a href="{% url 'all'%}"><i class="icon-user1"></i>Все</a></li>
 				<li><a href="{{ user.get_absolute_url }}"><i class="icon-user1"></i>Профиль</a></li>
-				<li><a href="#"><i class="icon-line-message-circle"></i>Сообщения <span class="badge badge-pill badge-secondary float-right" style="margin-top: 3px;">5</span></a></li>
-				<li><a href="{%url 'friends'%}"><i class="icon-line-users"></i>Друзья</a></li>
+				<li>
+					<a href="#"><i class="icon-line-message-circle"></i>Сообщения
+						<span class="badge badge-pill badge-secondary float-right" style="margin-top: 3px;">5</span>
+					</a>
+				</li>
+				<li>
+					<a href="{%url 'friends'%}"><i class="icon-line-users"></i>Друзья
+						{%if add_friends_count|length < 0 %}
+						<span></span>
+						{% elif add_friends_count|length == 0 %}
+						<span></span>
+						{% else%}
+						<span class="badge badge-pill badge-secondary float-right" style="margin-top: 3px;">
+							+{{add_friends_count|length }}
+						</span>
+						{%endif%}
+
+
+					</a>
+				</li>
 				<li><a href="#"><i class="icon-line2-note"></i>Паблики</a></li>
 			</ul>
 			{%else%}

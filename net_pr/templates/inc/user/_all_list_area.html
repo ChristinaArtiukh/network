@@ -1,0 +1,57 @@
+{%load static%}
+<style>
+	.team-image > a, .team-image img {
+    display: block;
+    width: 100%;
+}
+</style>
+<!-- Content
+		============================================= -->
+<section id="content">
+	<div class="content-wrap">
+		<div class="container clearfix">
+			<div class="row col-mb-50 mb-0">
+				{%for users in user_list %}
+				{% if user.id != users.id%}
+				<div class="col-lg-12">
+					<div class="team team-list row align-items-center">
+						<div class="team-image col-sm-2">
+							{%if users.photo%}
+							<a href="{{users.get_absolute_url}}"><img src="{{users.photo.url}}" alt="photo" ></a>
+							{%else%}
+							<a href="{{users.get_absolute_url}}"><img src="{% static 'images/icons/avatar.jpg' %}" alt="photo" ></a>
+							{%endif%}
+						</div>
+						<div class="team-desc col-sm-6">
+							<div class="team-title"><h5>{{users.last_name}} {{users.first_name}}</h5></div>
+							{%for friend in friends %}
+								{% if friend.friend_id == users.id and friend.id %}
+								<div>
+									<form method="post" action="{{friend.get_absolute_url}}">
+										{%csrf_token%}
+										<input type="hidden" name="id" id="id_id" value="{{friend.id}}">
+										<button type="submit" name="submit" value="delete_friend_form">Удалить</button>
+									</form>
+								</div>
+								<br>
+							{%endif%}
+							{%endfor%}
+								<div>
+									<form method="post">
+										{%csrf_token%}
+										<input type="hidden" name="friend" id="id_friend" value="{{users.slug}}">
+										<button type="submit" name="submit" value="add_friend_form">Добавить</button>
+									</form>
+								</div>
+
+						</div>
+					</div>
+				</div>
+				{%endif%}
+				{%endfor%}
+
+			</div>
+		</div>
+	</div>
+</section><!-- #content end -->
+<!-- #content end -->

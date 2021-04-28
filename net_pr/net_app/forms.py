@@ -1,6 +1,6 @@
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django import forms
-from .models import User, Post, CommentPost
+from .models import User, Post, CommentPost, Friend
 from django.utils.translation import gettext_lazy as gl
 
 
@@ -72,7 +72,14 @@ class UpdateCommentPostForm(forms.ModelForm):
         fields = ('comment', )
 
 
-class UpdateSecondCommentPostForm(forms.ModelForm):
+class AddFriendForm(forms.ModelForm):
     class Meta:
-        model = CommentPost
-        fields = ('comment', )
+        model = Friend
+        exclude = ('friend', 'name',)
+
+
+class ApproveFriendForm(forms.ModelForm):
+    class Meta:
+        model = Friend
+        fields = ('approve_friendship', )
+

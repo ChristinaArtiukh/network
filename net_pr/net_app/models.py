@@ -74,3 +74,17 @@ class CommentPost(models.Model):
 
     def __str__(self):
         return "{} - {}".format(self.name, self.comment)
+
+
+class Friend(models.Model):
+    name = models.ForeignKey('User', on_delete=models.CASCADE, related_name='first_friend')
+    friend = models.ForeignKey('User', on_delete=models.CASCADE, related_name='second_friend')
+    date_add = models.DateTimeField(auto_now_add=True)
+    approve_friendship = models.BooleanField(default=False)
+
+    class Meta:
+        verbose_name = 'Друг'
+        verbose_name_plural = 'Друзья'
+
+    def __str__(self):
+        return "{} - {}".format(self.name, self.friend)
