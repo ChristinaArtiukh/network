@@ -16,6 +16,7 @@ class User(AbstractUser):
     sex = models.CharField(choices=SEX_CHOICE, max_length=30, verbose_name='Пол', null=True)
     b_day = models.DateField(verbose_name='Дата рождения', null=True)
     slug = models.SlugField(verbose_name='Ссылка', unique=True, null=True)
+    friends = models.ManyToManyField()
 
     class Meta:
         verbose_name = 'Пользователь'
