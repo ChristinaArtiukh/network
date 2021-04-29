@@ -153,6 +153,7 @@
 											{%endif%}
 											<!-- Удаление поста
 ============================================= -->
+											{% if posts.poster_id == user.id or posts.name_id == user.id%}
 											<a class="comment-reply-link">
 												<form method="post" >
 													{%csrf_token%}
@@ -176,6 +177,7 @@
 													</div>
 												</form>
 											</a>
+											{%endif%}
 											<br>
 										</div>
 										<!-- Добавление комментария

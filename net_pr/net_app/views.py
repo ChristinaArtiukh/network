@@ -160,8 +160,10 @@ def profile(request, slug):
     # удаление родительского и дочернего комментария
     elif request.method == 'POST' and request.POST.get('submit') == 'delete_comment_form'\
             or request.POST.get('submit') == 'delete_second_comment_form':
-        this_comment = int(request.POST.get('comment'))
+        this_comment = request.POST.get('id')
+        print(request.POST, this_comment)
         CommentPost.objects.filter(pk=this_comment).delete()
+        print(request.POST, this_comment)
         return HttpResponseRedirect(request.path_info)
     else:
         post_form = CreatePostForm()
