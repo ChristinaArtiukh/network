@@ -16,7 +16,6 @@ class User(AbstractUser):
     sex = models.CharField(choices=SEX_CHOICE, max_length=30, verbose_name='Пол', null=True)
     b_day = models.DateField(verbose_name='Дата рождения', null=True)
     slug = models.SlugField(verbose_name='Ссылка', unique=True, null=True)
-    friends = models.ManyToManyField()
 
     class Meta:
         verbose_name = 'Пользователь'
@@ -45,7 +44,6 @@ class Post(models.Model):
     url = models.URLField(blank=True, null=True)
     video = models.FileField(upload_to='media/post/%Y/%m/%d', blank=True, null=True)
     music = models.FileField(upload_to='media/post/%Y/%m/%d', blank=True, null=True)
-
 
     class Meta:
         verbose_name = 'Пост'
@@ -77,7 +75,7 @@ class CommentPost(models.Model):
         return "{} - {}".format(self.name, self.comment)
 
 
-class Friend(models.Model):
+class Friends(models.Model):
     name = models.ForeignKey('User', on_delete=models.CASCADE, related_name='first_friend')
     friend = models.ForeignKey('User', on_delete=models.CASCADE, related_name='second_friend')
     date_add = models.DateTimeField(auto_now_add=True)
@@ -88,4 +86,4 @@ class Friend(models.Model):
         verbose_name_plural = 'Друзья'
 
     def __str__(self):
-        return "{} - {}".format(self.name, self.friend)
+        return "{} - {}".format(self.name, self.friend, )

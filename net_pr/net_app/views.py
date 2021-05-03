@@ -7,21 +7,21 @@ from django.template import RequestContext
 from django.urls import reverse
 from django.views.generic import CreateView, DetailView, ListView
 from django.views.generic.edit import FormMixin, UpdateView
-
-from .context_processors import searching
-from .models import User, Post, CommentPost, Friend
-from .forms import RegistrationForm, LoginForm, AddUserForm, CreatePostForm, UpdateUserForm,\
-    AddCommentForPostForm, AddCommentForCommentForm, UpdatePostForm, UpdateCommentPostForm,\
+from .models import User, Post, CommentPost, Friends
+from .forms import RegistrationForm, LoginForm, AddUserForm, CreatePostForm, UpdateUserForm, \
+    AddCommentForPostForm, AddCommentForCommentForm, UpdatePostForm, UpdateCommentPostForm, \
     AddFriendForm, ApproveFriendForm
 from django.db.models import Q
+
+
+# return redirect(reverse('profile', kwargs={'slug': request.user.slug}))
+
 
 def home(request):
     context = {
         'post': Post.objects.all().order_by('-date'),
     }
     return render(request, 'home.html', context)
-
-
 
 
 def user_logout(request):
@@ -43,31 +43,30 @@ def registration(request):
         if log_form.is_valid():
             user = log_form.get_user()
             login(request, user)
-            return redirect('home')
+            return redirect(reverse('profile', kwargs={'slug': request.user.slug}))
     elif request.method == "POST" and request.POST.get('submit') == 'register':
         reg_form = RegistrationForm(request.POST or None)
         if reg_form.is_valid():
             user = reg_form.save()
             login(request, user)
-            return redirect('add_profile')
+            return redirect(reverse('add_profile', kwargs={'slug': request.user.slug}))
         else:
             messages.error(request, 'Ошибка регистрации')
     else:
         log_form = LoginForm()
         reg_form = RegistrationForm()
-    return render(request, 'user/registration.html', {'log_form': log_form, 'reg_form':reg_form})
+    return render(request, 'user/registration.html', {'log_form': log_form, 'reg_form': reg_form})
 
 
-def add_profile(request):
+def add_profile(request, slug):
     '''
     Добавление данных к пользователю
     '''
     if request.method == 'POST':
         profile_form = AddUserForm(data=request.POST, files=request.FILES, instance=request.user)
         if profile_form.is_valid():
-            profile_form.save(commit=False)
             profile_form.save()
-            return redirect('profile')
+            return redirect(reverse('profile', kwargs={'slug': request.user.slug}))
     else:
         profile_form = AddUserForm()
     return render(request, 'user/add_profile.html', {'profile_form': profile_form})
@@ -161,7 +160,7 @@ def profile(request, slug):
         Post.objects.filter(pk=this_post).delete()
         return HttpResponseRedirect(request.path_info)
     # удаление родительского и дочернего комментария
-    elif request.method == 'POST' and request.POST.get('submit') == 'delete_comment_form'\
+    elif request.method == 'POST' and request.POST.get('submit') == 'delete_comment_form' \
             or request.POST.get('submit') == 'delete_second_comment_form':
         this_comment = request.POST.get('id')
         CommentPost.objects.filter(pk=this_comment).delete()
@@ -190,32 +189,31 @@ def friends_list(request):
     approve_friend_form = ApproveFriendForm()
     if request.method == 'POST' and request.POST.get('submit') == 'approve_friend_form':
         person = request.POST.get('id')
-        this_friend = get_object_or_404(Friend, id=person)
+        this_friend = get_object_or_404(Friends, id=person)
         approve_friend_form = AddFriendForm(data=request.POST, instance=this_friend)
-        print(person, this_friend, request.POST)
         if approve_friend_form.is_valid():
             approve_friend_form.save(commit=False)
             approve_friend_form.approve_friendship = request.POST.get('approve_friendship')
             approve_friend_form.save()
-            print(person, this_friend, request.POST)
             return redirect('friends')
     if request.method == 'POST' and request.POST.get('submit') == 'delete_friend_form':
         this_friend = int(request.POST.get('id'))
-        Friend.objects.filter(pk=this_friend).delete()
+        Friends.objects.filter(pk=this_friend).delete()
         return redirect('friends')
     else:
         approve_friend_form = ApproveFriendForm()
     context = {
         'approve_friend_form': approve_friend_form,
         'user_list': User.objects.all(),
-        'all_friends': Friend.objects.filter(approve_friendship=True),
-        'not_approve_friends': Friend.objects.filter(name=request.user, approve_friendship=False),
-        'my_request': Friend.objects.filter(friend=request.user, approve_friendship=False),
-        'count_not_approve_friends': Friend.objects.filter(friend=request.user, approve_friendship=False).annotate\
+        'all_friends': Friends.objects.filter(approve_friendship=True),
+        'not_approve_friends': Friends.objects.filter(name=request.user, approve_friendship=False),
+        'my_request': Friends.objects.filter(friend=request.user, approve_friendship=False),
+        'count_not_approve_friends': Friends.objects.filter(friend=request.user, approve_friendship=False).annotate \
             (count_not_approve_friends=Count('approve_friendship')).values_list('count_not_approve_friends', flat=True),
-        'count_all_friends': Friend.objects.filter(Q(name=request.user) | Q(friend=request.user)).filter\
-            (approve_friendship=True).annotate(count_all_friends=Count('approve_friendship')).values_list('count_all_friends', flat=True),
-        'count_my_request': Friend.objects.filter(name=request.user, approve_friendship=False).annotate \
+        'count_all_friends': Friends.objects.filter(Q(name=request.user) | Q(friend=request.user)).filter \
+            (approve_friendship=True).annotate(count_all_friends=Count('approve_friendship')).values_list(
+            'count_all_friends', flat=True),
+        'count_my_request': Friends.objects.filter(name=request.user, approve_friendship=False).annotate \
             (count_my_request=Count('approve_friendship')).values_list('count_my_request', flat=True),
     }
     return render(request, 'user/friends_list.html', context)
@@ -224,33 +222,36 @@ def friends_list(request):
 def users_list(request):
     add_friend_form = AddFriendForm()
     approve_friend_form = ApproveFriendForm()
+    # Подтверждение дружбы - не работает
     if request.method == 'POST' and request.POST.get('submit') == 'approve_friend_form':
-        person = request.POST.get('id')
-        this_friend = get_object_or_404(Friend, id=person)
-        approve_friend_form = AddFriendForm(data=request.POST, instance=this_friend)
-        print(person, this_friend, request.POST)
+        id_record = request.POST.get('id')
+        this_record = Friends.objects.get(id=id_record)
+        approve_friend_form = AddFriendForm(data=request.POST, instance=this_record)
+        print(id_record, this_record, request.POST, approve_friend_form)
         if approve_friend_form.is_valid():
             approve_friend_form.save(commit=False)
-            approve_friend_form.approve_friendship = request.POST.get('approve_friendship')
+            approve_friend_form.approve_friendship = True
             approve_friend_form.save()
-            print(person, this_friend, request.POST)
-            return redirect('friends')
+            print(id_record, this_record, request.POST)
+            return redirect('all')
+    # Добавление нового друга
     elif request.method == 'POST' and request.POST.get('submit') == 'add_friend_form':
-        person = request.POST.get('slug')
-        this_friend = User.objects.get(slug=person)
-        add_friend_form = AddFriendForm(data=request.POST)
+        person = int(request.POST.get('friend'))
+        add_friend_form = AddFriendForm(request.POST)
+        print(person, request.POST)
         if add_friend_form.is_valid():
             add_friend_form.save(commit=False)
-            add_friend_form.instance.name = request.user
-            add_friend_form.instance.friend = this_friend
+            add_friend_form.instance.first_friend = request.POST.get('name')
+            add_friend_form.instance.second_friend = person
             add_friend_form.save()
+            print(request.POST, request.POST.get('name'))
             return redirect('all')
     # удаление друга и запроса на дружбу
-    elif request.method == 'POST' and request.POST.get('submit') == 'delete_friend_form'\
-            or request.POST.get('submit') == 'delete_not_approve_friend_form'\
+    elif request.method == 'POST' and request.POST.get('submit') == 'delete_friend_form' \
+            or request.POST.get('submit') == 'delete_not_approve_friend_form' \
             or request.POST.get('submit') == 'delete_approve_friend_form':
         this_friend = int(request.POST.get('id'))
-        Friend.objects.filter(pk=this_friend).delete()
+        Friends.objects.filter(pk=this_friend).delete()
         return redirect('all')
     else:
         add_friend_form = AddFriendForm()
@@ -258,13 +259,7 @@ def users_list(request):
     context = {
         'add_friend_form': add_friend_form,
         'approve_friend_form': approve_friend_form,
-        'all_friends': Friend.objects.filter(approve_friendship=True),
-        'not_approve_friends': Friend.objects.filter(name=request.user, approve_friendship=False),
-        'my_request': Friend.objects.filter(friend=request.user, approve_friendship=False),
-        'all_user': Friend.objects.all(),
-
     }
-    print(context)
     return render(request, 'user/all_list.html', context)
 
 
