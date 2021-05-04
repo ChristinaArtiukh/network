@@ -7,6 +7,8 @@ from django.template import RequestContext
 from django.urls import reverse
 from django.views.generic import CreateView, DetailView, ListView
 from django.views.generic.edit import FormMixin, UpdateView
+
+from .context_processors import list_for_approve
 from .models import User, Post, CommentPost, Friends
 from .forms import RegistrationForm, LoginForm, AddUserForm, CreatePostForm, UpdateUserForm, \
     AddCommentForPostForm, AddCommentForCommentForm, UpdatePostForm, UpdateCommentPostForm, \
@@ -15,6 +17,25 @@ from django.db.models import Q
 
 
 # return redirect(reverse('profile', kwargs={'slug': request.user.slug}))
+def friends_of_friends(request):
+    approve_friends = list_for_approve(request)
+    if not approve_friends:
+        recommended_list = User.objects.all()
+    elif approve_friends:
+        recommended_list = []
+        if request.user.is_authenticated:
+            for approve_friend in approve_friends:
+                recommended = Friends.objects.values_list('friend', 'name').filter(
+                    Q(name=approve_friend) | Q(friend=approve_friend))
+                for friend, name in recommended:
+                    recommended_list.append(friend)
+                    recommended_list.append(name)
+            recommended_list = set(recommended_list) - set(approve_friends)
+            recommended_list.remove(request.user.id)
+            recommended_list = list(recommended_list)
+    else: recommended_list = User.objects.all()
+    print(recommended_list)
+    return recommended_list
 
 
 def home(request):
@@ -100,9 +121,23 @@ def profile(request, slug):
     second_comment_form = AddCommentForCommentForm()
     update_post_form = UpdatePostForm()
     update_comment_form = UpdateCommentPostForm()
+    add_friend_form = AddFriendForm()
     this_name = User.objects.get(slug=slug)
+    approve_friends_list = list_for_approve(request)
+    recommended_list = friends_of_friends(request)
+    if request.method == 'POST' and request.POST.get('submit') == 'add_friend_form':
+        person = int(request.POST.get('friend'))
+        add_friend_form = AddFriendForm(request.POST)
+        print(person, request.POST)
+        if add_friend_form.is_valid():
+            add_friend_form.save(commit=False)
+            add_friend_form.instance.first_friend = int(request.POST.get('name'))
+            add_friend_form.instance.second_friend = person
+            add_friend_form.save()
+            print(request.POST, request.POST.get('name'))
+            return HttpResponseRedirect(request.path_info)
     # добавление поста на страницу
-    if request.method == 'POST' and request.POST.get('submit') == 'post_form':
+    elif request.method == 'POST' and request.POST.get('submit') == 'post_form':
         post_form = CreatePostForm(data=request.POST, files=request.FILES)
         if post_form.is_valid():
             post_form.save(commit=False)
@@ -171,16 +206,21 @@ def profile(request, slug):
         second_comment_form = AddCommentForCommentForm()
         update_post_form = UpdatePostForm()
         update_comment_form = UpdateCommentPostForm()
+        add_friend_form = AddFriendForm()
     context = {
         'post_form': post_form,
         'comment_form': comment_form,
+        'add_friend_form': add_friend_form,
         'second_comment_form': second_comment_form,
         'update_post_form': update_post_form,
         'update_comment_form': update_comment_form,
         'profile': User.objects.filter(slug=slug),
         'posts': Post.objects.all().order_by('-date'),
         'comment': CommentPost.objects.filter(parent__isnull=True).order_by('-date'),
-        'second_comment': CommentPost.objects.filter(parent__isnull=False).order_by('-date')
+        'second_comment': CommentPost.objects.filter(parent__isnull=False).order_by('-date'),
+        'user_list': User.objects.all(),
+        'recommended_list': recommended_list,
+        'approve_friends_list': approve_friends_list,
     }
     return render(request, 'user/profile.html', context)
 
@@ -215,6 +255,7 @@ def friends_list(request):
             'count_all_friends', flat=True),
         'count_my_request': Friends.objects.filter(name=request.user, approve_friendship=False).annotate \
             (count_my_request=Count('approve_friendship')).values_list('count_my_request', flat=True),
+
     }
     return render(request, 'user/friends_list.html', context)
 
@@ -259,6 +300,7 @@ def users_list(request):
     context = {
         'add_friend_form': add_friend_form,
         'approve_friend_form': approve_friend_form,
+        'search_request': request.GET.get('search')
     }
     return render(request, 'user/all_list.html', context)
 

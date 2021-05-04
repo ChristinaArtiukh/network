@@ -86,4 +86,4 @@ class Friends(models.Model):
         verbose_name_plural = 'Друзья'
 
     def __str__(self):
-        return "{} - {}".format(self.name, self.friend, )
+        return "{} - {}".format(self.name, self.friend)

@@ -19,11 +19,13 @@
     border-radius: 0px;
     padding: 10px 10px 0px 35px;
     }
+
 </style>
 
 <!-- Content
 ============================================= -->
 <section id="content">
+
 	<div class="content-wrap">
 		<div class="container clearfix">
 <!-- Данные профиля
@@ -40,6 +42,16 @@
 						<h4>{{profile.first_name}} {{profile.last_name}}</h4>
 							{% if profile.id == user.id%}
 								<a href="{{ profile.update }}">Редактировать</a>
+							{%else%}
+						{%for user_list in user_list%}
+						{%if user_list.id == profile.id %}
+								<form method="post">{%csrf_token%}
+									<input type="hidden" name="name" id="id_name" value="{{user.id}}">
+									<input type="hidden" name="friend" id="id_friend" value="{{user_list.id}}">
+									<button class="button button-3d button-small button-rounded button-aqua" type="submit" name="submit" value="add_friend_form">Добавить</button>
+								</form>
+						{%endif%}
+						{%endfor%}
 							{%endif%}
 					</div>
 					<div class="clear"></div>
@@ -50,14 +62,43 @@
 							<p>Обо мне:  {{profile.bio}}</p>
 						</div>
 					</div>
+					{% if profile.id == user.id%}
+					<div class="container">
+					<div class="fancy-title title-center title-border topmargin">
+						<h4>Рекомендуемые друзья</h4>
+					</div>
+					<div id="oc-images" class="owl-carousel image-carousel carousel-widget" data-items-xs="2" data-items-sm="3" data-items-lg="4" data-items-xl="5">
+						{%for user_list in user_list%}
+						{% for recommended_list in recommended_list%}
+							{% if recommended_list == user_list.id%}
+						<div class="oc-item">
+								{%if user_list.photo%}
+							<a href="{{user_list.get_absolute_url}}"><img src="{{user_list.photo.url}}" alt="Image 1"></a>
+								{%else%}
+							<a href="{{user_list.get_absolute_url}}"><img src="{% static 'images/icons/avatar.jpg' %}" alt="Image 1"></a>
+								{%endif%}
+							<div class="product-desc center">
+								<div class="product-title"><h5>
+									<a href="{{user_list.get_absolute_url}}">{{user_list.first_name}} {{user_list.last_name}}</a></h5></div>
+								</div>
+							</div>
+							{%endif%}
+							{%endfor%}
+						{%endfor%}
+					</div>
 				</div>
-				<div class="w-100 line d-block d-md-none"></div>
+					{%endif%}
+					<br><br>
 			</div>
+			<div class="w-100 line d-block d-md-none"></div>
+		</div>
+
 			<div class="row clearfix">
 				<div class="col-md-12">
 					<div class="clear"></div>
 					<div class="row clearfix">
 						<div class="card-body" style="padding: 10px;">
+
 <!-- Добавление поста
 ============================================= -->
 							<form action=" " method="post" enctype="multipart/form-data">
@@ -415,3 +456,4 @@
 </section>
 
 <!-- #content end -->
+
