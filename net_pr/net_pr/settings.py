@@ -13,6 +13,7 @@ import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
@@ -39,7 +40,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'net_app.apps.NetAppConfig',
     'debug_toolbar',
-    'mptt',
+    'chat',
+    'channels',
 ]
 
 MIDDLEWARE = [
@@ -72,9 +74,17 @@ TEMPLATES = [
         },
     },
 ]
-
+ASGI_APPLICATION = 'net_pr.asgi.application'
 WSGI_APPLICATION = 'net_pr.wsgi.application'
 
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [('127.0.0.1', 6379)],
+        },
+    },
+}
 
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases

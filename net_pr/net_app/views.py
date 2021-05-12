@@ -33,16 +33,13 @@ def friends_of_friends(request):
             recommended_list = set(recommended_list) - set(approve_friends)
             recommended_list.remove(request.user.id)
             recommended_list = list(recommended_list)
-    else: recommended_list = User.objects.all()
-    print(recommended_list)
+    else:
+        recommended_list = User.objects.all()
     return recommended_list
 
 
 def home(request):
-    context = {
-        'post': Post.objects.all().order_by('-date'),
-    }
-    return render(request, 'home.html', context)
+    return render(request, 'home.html')
 
 
 def user_logout(request):

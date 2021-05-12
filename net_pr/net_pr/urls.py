@@ -20,7 +20,9 @@ from django.urls import path, include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('net_app.urls'))
+    path('', include('net_app.urls')),
+    path('chat/', include('chat.urls')),
+
 ]
 if settings.DEBUG:
     import debug_toolbar

@@ -53,13 +53,6 @@ def list_for_request_for_user(request):
     return request_user_friends
 
 
-# def friends(request):
-#     friend = Friends.objects.all()
-#     if request.user.is_authenticated:
-#         friend = friend.filter(Q(name=request.user) | Q(friend=request.user))
-#     return friend
-
-
 def is_valid_queryparam(param):
     return param != '' and param is not None
 

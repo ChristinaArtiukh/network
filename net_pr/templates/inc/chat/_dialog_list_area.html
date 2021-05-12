@@ -1,0 +1,105 @@
+{%load static%}
+
+<style>
+	.team-image > a, .team-image img {
+    display: block;
+    width: 100%;
+}
+.content-wrap {
+    position: relative;
+    padding: 30px 0;
+    overflow: hidden;
+}
+form {
+    margin-bottom: 0px;
+}
+</style>
+<!-- Content
+		============================================= -->
+<section id="content">
+	<div class="content-wrap">
+		<div class="container clearfix">
+			<div class="row col-mb-50 mb-0">
+				<div class="col-lg-12">
+                    <div class="team team-list row align-items-center">
+							<div class="team-image col-sm-2">
+								{%if all_people.photo%}
+								<a href="{{all_people.get_absolute_url}}"><img src="{{all_people.photo.url}}" alt="photo" ></a>
+								{%else%}
+								<a href="{{all_people.get_absolute_url}}"><img src="{% static 'images/icons/avatar.jpg' %}" alt="photo" ></a>
+								{%endif%}
+							</div>
+							<div class="team-desc col-sm-6">
+								<div class="team-title"><a href="{{all_people.get_absolute_url}}"><h5>{{all_people.last_name}} {{all_people.first_name}}</h5></a></div>
+								{%for other_people in other_people %}
+									{% if other_people %}
+										{% if other_people.id == all_people.id %}
+										<form method="post">{%csrf_token%}
+											<input type="hidden" name="name" id="id_name" value="{{user.id}}">
+											<input type="hidden" name="friend" id="id_friend" value="{{all_people.id}}">
+											<button class="button button-3d button-small button-rounded button-aqua" type="submit" name="submit" value="add_friend_form">Добавить</button>
+										</form>
+										{%endif%}
+									{%endif%}
+								{%endfor%}
+
+								{%for approve_friends in approve_friends %}
+									{% if approve_friends %}
+										{% if approve_friends == all_people.id %}
+											<p>Send message</p>
+										{%endif%}
+									{%endif%}
+								{%endfor%}
+
+
+									{%for request_friends in request_friends %}
+										{% if request_friends %}
+											{% if request_friends == all_people.id %}
+												<a href="{%url 'friends'%}">Запрос отправлен</a>
+											{%endif%}
+										{%endif%}
+									{%endfor%}
+
+								{% for friends in friend%}
+									{%for request_user_friends in request_user_friends %}
+										{% if request_user_friends %}
+											{% if request_user_friends == all_people.id and request_user_friends == friends.name_id %}
+											<form method="post">
+												{%csrf_token%}
+												<input type="hidden" name="id" id="id_id" value="{{friends.id}}">
+												<input type="hidden" name="approve_friendship" id="id_approve_friendship" value="on">
+												<button class="button button-3d button-small button-rounded button-aqua" type="submit" name="submit" value="approve_friend_form">Подтведить</button>
+											</form>
+											<form method="post">
+												{%csrf_token%}
+												<input type="hidden" name="id" id="id_id" value="{{friends.id}}">
+												<button class="button button-3d button-small button-rounded button-red" type="submit" name="submit" value="delete_friend_form">Удалить</button>
+											</form>
+											{%endif%}
+										{%endif%}
+									{%endfor%}
+								{%endfor%}
+
+								</div>
+							</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+<!-- #content end -->
+
+
+    <script>
+        document.querySelector('#room-name-input').focus();
+        document.querySelector('#room-name-input').onkeyup = function(e) {
+            if (e.keyCode === 13) {  // enter, return
+                document.querySelector('#room-name-submit').click();
+            }
+        };
+
+        document.querySelector('#room-name-submit').onclick = function(e) {
+            var roomName = document.querySelector('#room-name-input').value;
+            window.location.pathname = '/chat/' + roomName + '/';
+        };
+    </script>

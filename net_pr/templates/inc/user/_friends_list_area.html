@@ -95,7 +95,12 @@ form {
 												</div>
 												<div class="team-desc col-sm-6">
 													<div class="team-title"><h5>{{friends.friend.last_name}} {{friends.friend.first_name}}</h5></div>
-														<!-- удалить друга
+														<!-- написать другу
+		============================================= -->
+													<input id="room-name-input" type="hidden" size="100" value="{{friends.friend.username}}">
+														<button class="button button-3d button-small button-rounded button-aqua" id="room-name-submit" type="submit" name="submit" value="Enter">Написать</button>
+
+													<!-- удалить друга
 		============================================= -->
 															<form method="post">
 																{%csrf_token%}
@@ -192,3 +197,9 @@ form {
 		</div>
 	</div>
 </section><!-- #content end -->
+<script>
+      document.querySelector('#room-name-submit').onclick = function(e) {
+      var roomName = document.querySelector('#room-name-input').value;
+      window.location.pathname = '/chat/' + roomName + '/';
+      };
+</script>
