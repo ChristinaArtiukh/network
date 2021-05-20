@@ -48,13 +48,15 @@ form {
 								{%for approve_friends in approve_friends %}
 									{% if approve_friends %}
 										{% if approve_friends == all_people.id %}
-											<input id="room-name-input" type="hidden" size="100" value="{{all_people.username}}">
-											<button class="button button-3d button-small button-rounded button-aqua" id="room-name-submit" type="submit" name="submit" value="Enter">Написать</button>
-										{%endif%}
+								{%for chat in chat_list%}
+								{%if approve_friends == chat.id%}
+									<input id="room-name-input" type="hidden" size="100" value="{{chat.slug}}">
+									<button class="button button-3d button-small button-rounded button-aqua" id="room-name-submit" type="submit" name="submit" value="Enter">Написать</button>
+								{%endif%}
+								{%endfor%}
+								{%endif%}
 									{%endif%}
 								{%endfor%}
-
-
 									{%for request_friends in request_friends %}
 										{% if request_friends %}
 											{% if request_friends == all_people.id %}
@@ -95,8 +97,6 @@ form {
 	</div>
 </section>
 <!-- #content end -->
-
-
     <script>
         document.querySelector('#room-name-submit').onclick = function(e) {
             var roomName = document.querySelector('#room-name-input').value;

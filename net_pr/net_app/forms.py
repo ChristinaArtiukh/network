@@ -1,6 +1,6 @@
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django import forms
-from .models import User, Post, CommentPost, Friends
+from .models import User, Post, CommentPost, Friends, ChatDialog
 from django.utils.translation import gettext_lazy as gl
 
 
@@ -84,4 +84,10 @@ class ApproveFriendForm(forms.ModelForm):
         fields = ('approve_friendship',)
         exclude = ('friend', 'name')
 
+
+class ChatDialogForm(forms.ModelForm):
+    class Meta:
+        model = ChatDialog
+        fields = ('message',)
+        exclude = ('sender', 'recipient')
 

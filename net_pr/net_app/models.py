@@ -87,3 +87,10 @@ class Friends(models.Model):
 
     def __str__(self):
         return "{} - {}".format(self.name, self.friend)
+
+
+class ChatDialog(models.Model):
+    sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name='first_sender')
+    recipient = models.ForeignKey(User, on_delete=models.CASCADE, related_name='second_sender')
+    message = models.TextField()
+    time = models.DateTimeField(auto_now_add=True)

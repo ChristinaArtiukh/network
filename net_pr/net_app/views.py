@@ -3,16 +3,15 @@ from django.contrib.auth import login, logout
 from django.db.models import Count
 from django.http import HttpResponseRedirect
 from django.shortcuts import render, redirect, get_object_or_404
-from django.template import RequestContext
 from django.urls import reverse
-from django.views.generic import CreateView, DetailView, ListView
+from django.views import View
+from django.views.generic import ListView, DetailView
 from django.views.generic.edit import FormMixin, UpdateView
-
 from .context_processors import list_for_approve
-from .models import User, Post, CommentPost, Friends
+from .models import User, Post, CommentPost, Friends, ChatDialog
 from .forms import RegistrationForm, LoginForm, AddUserForm, CreatePostForm, UpdateUserForm, \
     AddCommentForPostForm, AddCommentForCommentForm, UpdatePostForm, UpdateCommentPostForm, \
-    AddFriendForm, ApproveFriendForm
+    AddFriendForm, ApproveFriendForm, ChatDialogForm
 from django.db.models import Q
 
 
@@ -265,24 +264,20 @@ def users_list(request):
         id_record = request.POST.get('id')
         this_record = Friends.objects.get(id=id_record)
         approve_friend_form = AddFriendForm(data=request.POST, instance=this_record)
-        print(id_record, this_record, request.POST, approve_friend_form)
         if approve_friend_form.is_valid():
             approve_friend_form.save(commit=False)
             approve_friend_form.approve_friendship = True
             approve_friend_form.save()
-            print(id_record, this_record, request.POST)
             return redirect('all')
     # Добавление нового друга
     elif request.method == 'POST' and request.POST.get('submit') == 'add_friend_form':
         person = int(request.POST.get('friend'))
         add_friend_form = AddFriendForm(request.POST)
-        print(person, request.POST)
         if add_friend_form.is_valid():
             add_friend_form.save(commit=False)
             add_friend_form.instance.first_friend = request.POST.get('name')
             add_friend_form.instance.second_friend = person
             add_friend_form.save()
-            print(request.POST, request.POST.get('name'))
             return redirect('all')
     # удаление друга и запроса на дружбу
     elif request.method == 'POST' and request.POST.get('submit') == 'delete_friend_form' \
@@ -297,8 +292,16 @@ def users_list(request):
     context = {
         'add_friend_form': add_friend_form,
         'approve_friend_form': approve_friend_form,
-        'search_request': request.GET.get('search')
+        'search_request': request.GET.get('search'),
+        'chat_list': User.objects.all()
     }
     return render(request, 'user/all_list.html', context)
+
+
+def room(request, room_name):
+    return render(request, 'chat/room.html', {
+        'room_name': room_name,
+        'chat': ChatDialog.objects.all().order_by('time')
+    })
 
 

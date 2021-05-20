@@ -40,7 +40,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'net_app.apps.NetAppConfig',
     'debug_toolbar',
-    'chat',
     'channels',
 ]
 
@@ -76,7 +75,6 @@ TEMPLATES = [
 ]
 ASGI_APPLICATION = 'net_pr.asgi.application'
 WSGI_APPLICATION = 'net_pr.wsgi.application'
-
 CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'channels_redis.core.RedisChannelLayer',
@@ -146,3 +144,4 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'net_app.User'
+

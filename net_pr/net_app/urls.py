@@ -1,7 +1,6 @@
 from django.urls import path
-from .views import home, registration, user_logout, add_profile, profile, UpdateUserInfo,\
-    users_list, friends_list
-
+from .views import home, registration, user_logout, add_profile, profile, UpdateUserInfo, \
+    users_list, friends_list, room
 urlpatterns = [
     path('', home, name='home'),
     path('login_registration/', registration, name='registration'),
@@ -11,5 +10,7 @@ urlpatterns = [
     path('all/', users_list, name='all'),
     path('profile/<slug:slug>/update', UpdateUserInfo.as_view(), name='update_profile'),
     path('friends/', friends_list, name='friends'),
+    path('chat/<str:room_name>/', room, name='room'),
+    # path('create/<str:room_name>/', MessageCreateView.as_view(), name='comment-create')
 
 ]
