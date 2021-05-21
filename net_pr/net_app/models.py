@@ -2,6 +2,7 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.urls import reverse
 from pytils.translit import slugify
+from django.utils.crypto import get_random_string
 
 
 class User(AbstractUser):
@@ -89,8 +90,17 @@ class Friends(models.Model):
         return "{} - {}".format(self.name, self.friend)
 
 
-class ChatDialog(models.Model):
-    sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name='first_sender')
-    recipient = models.ForeignKey(User, on_delete=models.CASCADE, related_name='second_sender')
+class Chat(models.Model):
+    room_name = models.ForeignKey('OneOnOneRoom', on_delete=models.CASCADE)
     message = models.TextField()
     time = models.DateTimeField(auto_now_add=True)
+
+
+class OneOnOneRoom(models.Model):
+    sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name='first_sender')
+    recipient = models.ForeignKey(User, on_delete=models.CASCADE, related_name='second_sender')
+    room_name = models.SlugField(unique=True, null=True)
+
+    def save(self, *args, **kwargs):
+        self.room_name = get_random_string(6,'0123456789ABCDIFGHRJKLMNOPQSTYWXZ')
+        super().save(*args, **kwargs)

@@ -2,7 +2,7 @@ import json
 
 from channels.db import database_sync_to_async
 from channels.generic.websocket import AsyncWebsocketConsumer
-from .models import ChatDialog, User
+from .models import Chat, OneOnOneRoom
 from django.shortcuts import get_object_or_404
 
 
@@ -32,6 +32,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         message = text_data_json['message']
         save_data = await self.save_data(message)
         data = {
+
             'message': save_data.message,
         }
         # Send message to room group
@@ -54,12 +55,10 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     @database_sync_to_async
     def save_data(self, message):
-        this_sender = get_object_or_404(User, id=self.scope['user'].id)
-        this_recipient = get_object_or_404(User, slug=self.room_name)
-        message = ChatDialog.objects.create(
+        this_room = get_object_or_404(OneOnOneRoom, room_name=self.room_name)
+        message = Chat.objects.create(
             message=message,
-            recipient=this_recipient,
-            sender=this_sender,
+            room_name=this_room
         )
         return message
 

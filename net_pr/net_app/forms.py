@@ -1,7 +1,10 @@
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django import forms
-from .models import User, Post, CommentPost, Friends, ChatDialog
+from .models import User, Post, CommentPost, Friends, OneOnOneRoom
 from django.utils.translation import gettext_lazy as gl
+
+
+
 
 
 class RegistrationForm(UserCreationForm):
@@ -78,6 +81,12 @@ class AddFriendForm(forms.ModelForm):
         fields = ('friend', 'name')
 
 
+class CreateOneOnOneRoomForm(forms.ModelForm):
+    class Meta:
+        model = OneOnOneRoom
+        fields = ('sender', 'recipient')
+
+
 class ApproveFriendForm(forms.ModelForm):
     class Meta:
         model = Friends
@@ -85,9 +94,4 @@ class ApproveFriendForm(forms.ModelForm):
         exclude = ('friend', 'name')
 
 
-class ChatDialogForm(forms.ModelForm):
-    class Meta:
-        model = ChatDialog
-        fields = ('message',)
-        exclude = ('sender', 'recipient')
 

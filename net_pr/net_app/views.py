@@ -8,10 +8,10 @@ from django.views import View
 from django.views.generic import ListView, DetailView
 from django.views.generic.edit import FormMixin, UpdateView
 from .context_processors import list_for_approve
-from .models import User, Post, CommentPost, Friends, ChatDialog
+from .models import User, Post, CommentPost, Friends, Chat, OneOnOneRoom
 from .forms import RegistrationForm, LoginForm, AddUserForm, CreatePostForm, UpdateUserForm, \
     AddCommentForPostForm, AddCommentForCommentForm, UpdatePostForm, UpdateCommentPostForm, \
-    AddFriendForm, ApproveFriendForm, ChatDialogForm
+    AddFriendForm, ApproveFriendForm, CreateOneOnOneRoomForm
 from django.db.models import Q
 
 
@@ -259,6 +259,7 @@ def friends_list(request):
 def users_list(request):
     add_friend_form = AddFriendForm()
     approve_friend_form = ApproveFriendForm()
+    create_room_form = CreateOneOnOneRoomForm()
     # Подтверждение дружбы - не работает
     if request.method == 'POST' and request.POST.get('submit') == 'approve_friend_form':
         id_record = request.POST.get('id')
@@ -271,13 +272,11 @@ def users_list(request):
             return redirect('all')
     # Добавление нового друга
     elif request.method == 'POST' and request.POST.get('submit') == 'add_friend_form':
-        person = int(request.POST.get('friend'))
         add_friend_form = AddFriendForm(request.POST)
-        if add_friend_form.is_valid():
-            add_friend_form.save(commit=False)
-            add_friend_form.instance.first_friend = request.POST.get('name')
-            add_friend_form.instance.second_friend = person
+        create_room_form = CreateOneOnOneRoomForm(request.POST)
+        if create_room_form.is_valid() and add_friend_form.is_valid():
             add_friend_form.save()
+            create_room_form.save()
             return redirect('all')
     # удаление друга и запроса на дружбу
     elif request.method == 'POST' and request.POST.get('submit') == 'delete_friend_form' \
@@ -289,19 +288,22 @@ def users_list(request):
     else:
         add_friend_form = AddFriendForm()
         approve_friend_form = ApproveFriendForm()
+        create_room_form = CreateOneOnOneRoomForm()
     context = {
+        'create_room_form': create_room_form,
         'add_friend_form': add_friend_form,
         'approve_friend_form': approve_friend_form,
         'search_request': request.GET.get('search'),
-        'chat_list': User.objects.all()
+        'chat_list': OneOnOneRoom.objects.all()
     }
     return render(request, 'user/all_list.html', context)
 
 
 def room(request, room_name):
+    room = get_object_or_404(OneOnOneRoom, room_name=room_name)
     return render(request, 'chat/room.html', {
         'room_name': room_name,
-        'chat': ChatDialog.objects.all().order_by('time')
+        'chat': Chat.objects.filter(room_name=room).order_by('time')
     })
 
 
