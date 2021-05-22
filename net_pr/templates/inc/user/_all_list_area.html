@@ -49,16 +49,21 @@ form {
 								{%endfor%}
 
 								{%for approve_friends in approve_friends %}
-									{% if approve_friends %}
-										{% if approve_friends == all_people.id %}
-											{%for chat in chat_list%}
-											{%if approve_friends == chat.recipient_id or approve_friends == chat.sender_id %}
-												<input id="room-name-input" name="room_name" type="hidden" size="100" value="{{chat.room_name}}">
-												<button class="button button-3d button-small button-rounded button-aqua" id="room-name-submit" type="submit" name="submit" value="Enter">Написать</button>
+									{%for room in room_list%}
+										{% if approve_friends %}
+											{% if approve_friends == all_people.id and approve_friends == room.recipient_id %}
+												<a href="{% url 'room' room_name=room.room_name %}">
+													<button class="button button-3d button-small button-rounded button-aqua">Написать</button>
+												</a>
+											{%endif%}
+											{% if approve_friends == all_people.id and approve_friends == room.sender_id %}
+												<a href="{% url 'room' room_name=room.room_name %}">
+													<button class="button button-3d button-small button-rounded button-aqua">Написать</button>
+												</a>
+											{%endif%}
+
 										{%endif%}
-										{%endfor%}
-								{%endif%}
-									{%endif%}
+									{%endfor%}
 								{%endfor%}
 									{%for request_friends in request_friends %}
 										{% if request_friends %}
@@ -100,9 +105,3 @@ form {
 	</div>
 </section>
 <!-- #content end -->
-    <script>
-        document.querySelector('#room-name-submit').onclick = function(e) {
-            var roomName = document.querySelector('#room-name-input').value;
-            window.location.pathname = '/chat/' + roomName + '/';
-        };
-    </script>

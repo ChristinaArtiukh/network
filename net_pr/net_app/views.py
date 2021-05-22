@@ -7,7 +7,7 @@ from django.urls import reverse
 from django.views import View
 from django.views.generic import ListView, DetailView
 from django.views.generic.edit import FormMixin, UpdateView
-from .context_processors import list_for_approve
+from .context_processors import list_for_approve, list_for_qs
 from .models import User, Post, CommentPost, Friends, Chat, OneOnOneRoom
 from .forms import RegistrationForm, LoginForm, AddUserForm, CreatePostForm, UpdateUserForm, \
     AddCommentForPostForm, AddCommentForCommentForm, UpdatePostForm, UpdateCommentPostForm, \
@@ -294,16 +294,51 @@ def users_list(request):
         'add_friend_form': add_friend_form,
         'approve_friend_form': approve_friend_form,
         'search_request': request.GET.get('search'),
-        'chat_list': OneOnOneRoom.objects.all()
+        'room_list': OneOnOneRoom.objects.filter(Q(sender=request.user) | Q(recipient=request.user))
     }
     return render(request, 'user/all_list.html', context)
+
+
+def last_message(request):
+    rooms = OneOnOneRoom.objects.filter(Q(sender=request.user) | Q(recipient=request.user)).values_list('id', flat=True)
+    list_messages = []
+    for i in rooms:
+        message = Chat.objects.filter(room_name_id=i).values_list('id', flat=True).last()
+        if message is not None:
+            list_messages.append(message)
+    return list_messages
+
+
+def last_message_not_active_rooms(request):
+    rooms = OneOnOneRoom.objects.filter(Q(sender=request.user) | Q(recipient=request.user)).values_list('id', flat=True)
+    not_active_rooms = []
+    for i in rooms:
+        message = Chat.objects.filter(room_name_id=i).values_list('id', flat=True).last()
+        if message is None:
+            not_active_rooms.append(i)
+    return not_active_rooms
+
+
+def all_dialogs(request):
+    list_messages = last_message(request)
+    list_not_active_rooms = last_message_not_active_rooms(request)
+    context = {
+        'list_messages': list_messages,
+        'list_not_active_rooms': list_not_active_rooms,
+        'chat_list': Chat.objects.all(),
+        'room_list': OneOnOneRoom.objects.filter(Q(sender=request.user) | Q(recipient=request.user)),
+        'all_people': User.objects.all(),
+    }
+    return render(request, 'chat/all_dialogs.html', context)
 
 
 def room(request, room_name):
     room = get_object_or_404(OneOnOneRoom, room_name=room_name)
     return render(request, 'chat/room.html', {
         'room_name': room_name,
-        'chat': Chat.objects.filter(room_name=room).order_by('time')
+        'chat': Chat.objects.filter(room_name=room).order_by('time'),
     })
+
+
 
 

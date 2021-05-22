@@ -21,7 +21,7 @@ textarea {
 				<div class="col-lg-12">
                        <textarea id="chat-log" cols="100" rows="15">
                            {%for chat in chat%}
-                            {{chat.message}}
+                            {{chat.sender.first_name}}: {{chat.message}}
                            {%endfor%}
                        </textarea>
                     <br> <br>
@@ -50,7 +50,9 @@ textarea {
 
         chatSocket.onmessage = function(e) {
             const data = JSON.parse(e.data);
-            document.querySelector('#chat-log').value += (data['message']['message'] + '\n');
+
+            document.querySelector('#chat-log').value += (
+            data['message']['sender']+ ': ' + data['message']['message'] + '\n');
         };
 
         chatSocket.onclose = function(e) {

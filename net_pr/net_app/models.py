@@ -91,15 +91,30 @@ class Friends(models.Model):
 
 
 class Chat(models.Model):
+    sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sender', default=1)
     room_name = models.ForeignKey('OneOnOneRoom', on_delete=models.CASCADE)
     message = models.TextField()
     time = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = 'Чат'
+        verbose_name_plural = 'Чаты'
+
+    def __str__(self):
+        return self.message
 
 
 class OneOnOneRoom(models.Model):
     sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name='first_sender')
     recipient = models.ForeignKey(User, on_delete=models.CASCADE, related_name='second_sender')
     room_name = models.SlugField(unique=True, null=True)
+
+    class Meta:
+        verbose_name = 'Переговорная'
+        verbose_name_plural = 'Переговорные'
+
+    def __str__(self):
+        return self.room_name
 
     def save(self, *args, **kwargs):
         self.room_name = get_random_string(6,'0123456789ABCDIFGHRJKLMNOPQSTYWXZ')

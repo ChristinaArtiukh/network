@@ -1,0 +1,129 @@
+{%load static%}
+
+<style>
+	.team-image > a, .team-image img {
+    display: block;
+    width: 100%;
+}
+.content-wrap {
+    position: relative;
+    padding: 30px 0;
+    overflow: hidden;
+}
+form {
+    margin-bottom: 0px;
+}
+</style>
+<!-- Content
+		============================================= -->
+<section id="content">
+	<div class="content-wrap">
+		<div class="container clearfix">
+			<div class="row col-mb-50 mb-0">
+				<div class="col-lg-12">
+				{%for room in room_list%}
+						{% if room.sender_id == user.id %}
+							<div class="team team-list row align-items-center">
+								<div class="team-image col-sm-2">
+										{%if room.recipient.photo%}
+										<a href="{{room.recipient.get_absolute_url}}"><img src="{{room.recipient.photo.url}}" alt="photo" ></a>
+										{%else%}
+										<a href="{{room.recipient.get_absolute_url}}"><img src="{% static 'images/icons/avatar.jpg' %}" alt="photo" ></a>
+										{%endif%}
+								</div>
+								<div class="team-desc col-sm-6">
+									<div class="team-title">
+										<a href="{{room.recipient.get_absolute_url}}">
+											<h5>{{room.recipient.last_name}} {{room.recipient.first_name}}</h5>
+										</a>
+									</div>
+
+									<a href="{% url 'room' room_name=room.room_name %}">
+										{%for chat in chat_list%}
+											{%for message in list_messages %}
+												{%if chat.id == message and chat.room_name_id == room.id %}
+												{{chat.sender.first_name}}: {{chat.message}}
+											{%endif%}
+											{%endfor%}
+										{%endfor%}
+										{%for list_not_active_rooms in list_not_active_rooms%}
+										{%if room.id == list_not_active_rooms %}
+										NO
+										{%endif%}
+											{%endfor%}
+								</a>
+								</div>
+							</div>
+						{%endif%}
+						{% if room.recipient_id == user.id %}
+							<div class="team team-list row align-items-center">
+								<div class="team-image col-sm-2">
+										{%if room.sender.photo%}
+										<a href="{{room.sender.get_absolute_url}}"><img src="{{room.sender.photo.url}}" alt="photo" ></a>
+										{%else%}
+										<a href="{{room.sender.get_absolute_url}}"><img src="{% static 'images/icons/avatar.jpg' %}" alt="photo" ></a>
+										{%endif%}
+								</div>
+								<div class="team-desc col-sm-6">
+									<div class="team-title">
+										<a href="{{room.sender.get_absolute_url}}">
+											<h5>{{room.sender.last_name}} {{room.sender.first_name}}</h5>
+									</a>
+									</div>
+
+								<a href="{% url 'room' room_name=room.room_name %}">
+									{%for chat in chat_list%}
+											{%for message in list_messages %}
+												{%if chat.id == message and chat.room_name_id == room.id %}
+												{{chat.sender.first_name}}: {{chat.message}}
+											{%endif%}
+											{%endfor%}
+										{%endfor%}
+										{%for list_not_active_rooms in list_not_active_rooms%}
+										{%if room.id == list_not_active_rooms %}
+									<button class="button button-3d button-small button-rounded button-aqua">Написать</button>
+										{%endif%}
+											{%endfor%}
+								</a>
+									</div>
+							</div>
+						{%endif%}
+				{%endfor%}
+
+
+
+<!--				<div class="col-lg-12">-->
+<!--				{% if approve_friends %}-->
+<!--				{%for approve_friends in approve_friends %}-->
+<!--					{%for all_people in all_people%}-->
+<!--						{% if approve_friends == all_people.id %}-->
+<!--					<div class="team team-list row align-items-center">-->
+<!--					<div class="team-image col-sm-2">-->
+<!--						{%if all_people.photo%}-->
+<!--						<a href="{{all_people.get_absolute_url}}"><img src="{{all_people.photo.url}}" alt="photo" ></a>-->
+<!--						{%else%}-->
+<!--						<a href="{{all_people.get_absolute_url}}"><img src="{% static 'images/icons/avatar.jpg' %}" alt="photo" ></a>-->
+<!--						{%endif%}-->
+<!--					</div>-->
+<!--					<div class="team-desc col-sm-6">-->
+<!--						<div class="team-title"><a href="{{all_people.get_absolute_url}}"><h5>{{all_people.last_name}} {{all_people.first_name}}</h5></a></div>-->
+<!--						{%endif%}-->
+<!--						{%endfor%}-->
+<!--{%for room in room %}-->
+<!--									<a href="{% url 'room' room_name=room %}"> HI{{chat_list.sender}}: {{chat_list.message}}</a>-->
+<!--{%endfor%}-->
+
+
+<!--					</div>-->
+<!--				</div>-->
+<!--				{%endfor%}-->
+<!--				{%else%}-->
+<!--				<h3>Активных переписок нет</h3>-->
+<!--				{%endif%}-->
+<!--				</div>-->
+			</div>
+			</div>
+		</div>
+	</div>
+</section>
+<!-- #content end -->
