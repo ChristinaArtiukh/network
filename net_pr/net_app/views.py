@@ -325,7 +325,7 @@ def all_dialogs(request):
     context = {
         'list_messages': list_messages,
         'list_not_active_rooms': list_not_active_rooms,
-        'chat_list': Chat.objects.all(),
+        'chat_list': Chat.objects.all().order_by('-time'),
         'room_list': OneOnOneRoom.objects.filter(Q(sender=request.user) | Q(recipient=request.user)),
         'all_people': User.objects.all(),
     }
